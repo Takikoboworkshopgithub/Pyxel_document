@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5. ゲームを作ろう ― Python + Pyxel ゲーム開発 | IQ Python Workshop</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            scroll-behavior: smooth;
+        }
+
+        pre {
+            margin: 0 !important;
+            padding: 1.25rem !important;
+            border-radius: 0.5rem;
+            background: #1e293b !important;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #334155;
+            transition: border-color 0.2s ease;
+        }
+
+        pre:hover {
+            border-color: #60a5fa;
+        }
+
+        code.hljs {
+            font-family: 'Consolas', 'Monaco', 'Ubuntu Mono', monospace !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+
+        .code-container {
+            position: relative;
+            height: 100%;
+        }
+
+        @media (hover: hover) {
+            pre:hover::after {
+                content: 'Tap to Copy';
+                position: absolute;
+                bottom: 10px;
+                right: 15px;
+                font-size: 0.75rem;
+                color: #94a3b8;
+                pointer-events: none;
+            }
+        }
+
+        .prose-custom p {
+            margin-bottom: 1rem;
+            line-height: 1.9;
+        }
+
+        .prose-custom ul {
+            margin: 0 0 1rem 1.5rem;
+            list-style: disc;
+        }
+
+        .prose-custom li {
+            margin-bottom: 0.35rem;
+        }
+
+        .diagram {
+            width: 100%;
+            height: auto;
+            max-width: 900px;
+            margin: 1.5rem auto;
+            display: block;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table th, table td {
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-10">
+
+    <!-- 左側：目次 -->
+    <aside class="md:w-64 flex-shrink-0 hidden md:block">
+        <nav id="toc" class="sticky top-10 flex flex-col space-y-1 border-l-2 border-slate-800 pl-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">目次</p>
+            <a href="#intro" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">Introduction</a>
+            <a href="#section-5-1" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">5.1 最小のゲームを作る</a>
+            <a href="#section-5-2" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">5.2 ゲームをどう設計するか</a>
+            <a href="#section-5-3" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">5.3 クラスを実装する</a>
+            <a href="#section-5-4" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">5.4 オブジェクトを増やす</a>
+            <a href="#section-5-5" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">5.5 当たり判定</a>
+            <a href="#section-5-6" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">5.6 ゲームらしくする</a>
+            <a href="#section-5-7" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">5.7 継承を使って設計を整理する</a>
+            <a href="#section-final" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">最終コード</a>
+        </nav>
+    </aside>
+
+    <!-- 右側：メインコンテンツ -->
+    <main class="flex-1 space-y-16">
+
+        <header class="border-b border-slate-800 pb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-100 tracking-tight">5. ゲームを作ろう</h1>
+            <p class="text-lg text-slate-400 mt-2">Python + Pyxelでシューティングゲームを作りながら、オブジェクト指向的な設計を学ぶ</p>
+        </header>
+
+        <!-- 章の重要NOTICE -->
+        <div class="bg-amber-950/40 border-l-4 border-amber-500 p-6 rounded-r-lg shadow-lg">
+            <h3 class="text-xl font-bold text-amber-300 mb-3 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                この章の重要なお知らせ
+            </h3>
+            <p class="text-slate-200 font-medium leading-relaxed">
+                この章では、単にコードを写してゲームを完成させることだけを目的にしません。<br><br>
+                <strong class="text-white border-b-2 border-amber-400">「ゲームを実装するには、何をオブジェクトとして扱う必要があるのか」「それぞれのオブジェクトは何を知っているべきなのか」「どの処理を誰の責務にするべきなのか」</strong><br>
+                という「設計」の考え方を身につけることを重視します。
+            </p>
+        </div>
+
+        <!-- Introduction -->
+        <section id="intro" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center">
+                <span class="text-blue-400 mr-2">#</span> Introduction
+            </h2>
+            <div class="prose-custom text-slate-300">
+                <p>これまでPythonの基本文法やリスト、関数、そして「クラス」について学んできました。今回はそれらの知識を総動員して、PythonとPyxelを使った「シューティングゲーム」を段階的に制作します。</p>
+                <p>この章では、ゲームの見た目を作るだけでなく、ゲームの中に存在するものをどのようにクラスとして整理し、責務をどのように分けるかを考えていきます。</p>
+                <p>次週では、各々でPyxelのゲームを制作する回になります。今回は、実際にゲームを制作する際にどのような手順で設計するかについて、シューティングゲームを題材に考えていきましょう。</p>
+            </div>
+        </section>
+
+        <!-- 5.1 -->
+        <section id="section-5-1" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">5.1 最小のゲームを作る</h2>
+
+            <p class="text-slate-300 mb-4">まずはシューティングゲームとして最低限必要な要素を整理してみましょう。</p>
+            <ul class="list-disc ml-6 text-slate-300 mb-6 space-y-1">
+                <li>プレイヤーを動かす</li>
+                <li>敵を置く</li>
+                <li>弾を発射する</li>
+                <li>当たり判定を行う</li>
+                <li>敵を倒す</li>
+            </ul>
+
+            <p class="text-slate-300 mb-4">クラスを一切使わず、手続き型のプログラムとして「プレイヤーを左右に動かすだけ」のコードを書くと、以下のようになります。</p>
+
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">import pyxel
+
+x = 80
+y = 100
+
+def update():
+    global x
+    if pyxel.btn(pyxel.KEY_LEFT):
+        x -= 2
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        x += 2
+
+def draw():
+    pyxel.cls(0)
+    pyxel.rect(x, y, 8, 8, 9)
+
+pyxel.init(160, 120)
+pyxel.run(update, draw)</code></pre>
+            </div>
+
+            <p class="text-slate-300 mb-6">このように手続き型でコーディングすることも可能ですが、ここに「敵10体」「それぞれのHP」「弾丸50発」が追加されたらどうなるでしょうか？ 無数の <code>global</code> 変数と、巨大な <code>update()</code> 関数ができあがり、すぐにコードの修正が困難（スパゲッティコード）になってしまいます。<br>複雑なゲームを作るためには、「何が必要なのか」を見極め、<strong>役割ごとにプログラムを分割する</strong>必要があります。</p>
+
+            <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                <p class="font-bold text-emerald-400 mb-3 text-lg"> 関数・構文の復讐</p>
+                <ul class="list-disc ml-5 text-sm text-slate-300 space-y-2">
+                    <li><code>pyxel.init(width, height)</code> : Pyxelの画面を初期化します。今回は幅160、高さ120の画面を作ります。</li>
+                    <li><code>pyxel.run(update, draw)</code> : ゲームループを開始します。Pyxelは自動的に <code>update()</code> と <code>draw()</code> を繰り返し呼び出します。</li>
+                    <li><code>pyxel.btn(key)</code> : 指定されたキーが押されていれば <code>True</code> を返します。</li>
+                    <li><code>pyxel.KEY_LEFT</code> / <code>pyxel.KEY_RIGHT</code> : 左キーと右キーを表す定数です。</li>
+                    <li><code>pyxel.cls(color)</code> : 画面を指定した色（0は黒）でクリアします。</li>
+                    <li><code>pyxel.rect(x, y, w, h, color)</code> : 指定した位置に矩形（四角形）を描画します。</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">Pyxelのゲームループ構造</h3>
+            <svg viewBox="0 0 600 250" class="diagram">
+                <defs>
+                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa" />
+                    </marker>
+                </defs>
+                <rect x="50" y="50" width="150" height="60" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2"/>
+                <text x="125" y="85" fill="#f8fafc" font-size="16" text-anchor="middle" font-weight="bold">update()</text>
+                <text x="125" y="135" fill="#94a3b8" font-size="12" text-anchor="middle">ゲーム状態の計算・更新</text>
+                <rect x="400" y="50" width="150" height="60" rx="8" fill="#1e293b" stroke="#a855f7" stroke-width="2"/>
+                <text x="475" y="85" fill="#f8fafc" font-size="16" text-anchor="middle" font-weight="bold">draw()</text>
+                <text x="475" y="135" fill="#94a3b8" font-size="12" text-anchor="middle">現在の状態を画面に描画</text>
+                <path d="M 210 70 Q 300 30 390 70" fill="none" stroke="#60a5fa" stroke-width="3" marker-end="url(#arrow-blue)"/>
+                <path d="M 390 90 Q 300 130 210 90" fill="none" stroke="#60a5fa" stroke-width="3" marker-end="url(#arrow-blue)"/>
+                <text x="300" y="45" fill="#cbd5e1" font-size="14" text-anchor="middle">更新が終わったら描画へ</text>
+                <text x="300" y="145" fill="#cbd5e1" font-size="14" text-anchor="middle">描画が終わったら次の更新へ</text>
+                <text x="300" y="190" fill="#f8fafc" font-size="16" text-anchor="middle" font-weight="bold">ゲームループとして繰り返される</text>
+            </svg>
+            <p class="text-sm text-slate-400 text-center">「計算」と「描画」は明確に分離されています。</p>
+        </section>
+
+        <!-- 5.2 -->
+        <section id="section-5-2" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">5.2 ゲームをどう設計するか</h2>
+            <p class="text-slate-300 mb-4">ここがこの章で最も重要なパートです。まずは「誰に何を任せるか」という<strong>責務分担</strong>を考えます。</p>
+
+            <div class="bg-slate-800/60 border border-slate-700 rounded-md p-5 mb-8">
+                <h3 class="text-xl font-bold text-blue-400 mb-3">責務分担を考えてみよう！</h3>
+                <p class="text-slate-300 mb-3">シューティングゲームを作るとき、以下の処理は<strong>どのオブジェクトが担当するべき</strong>でしょうか？</p>
+                <ul class="list-disc ml-5 text-slate-300 space-y-1">
+                    <li>プレイヤーの位置は誰が管理する？</li>
+                    <li>プレイヤーのHPは誰が持つ？</li>
+                    <li>敵の位置は誰が管理する？</li>
+                    <li>弾丸の位置は誰が管理する？</li>
+                    <li><strong>弾丸が敵に当たったかどうかは誰が判定する？</strong></li>
+                    <li>敵が倒れたことは誰が判断する？</li>
+                    <li><strong>倒した敵の数を誰が数える？</strong></li>
+                    <li><strong>ゲームオーバーになったかどうかは誰が判断する？</strong></li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.2.1 必要なクラスを考える</h3>
+            <p class="text-slate-300 mb-4">このゲームには、どんな「存在」が必要でしょうか。現実世界に例えて考えてみましょう。</p>
+            <p class="text-slate-300 mb-4">プレイヤーはプレイヤー自身の位置やHPを把握しているのが自然です。敵も同じですね。弾丸も、自分自身の位置と飛んでいく速度を持っているのが自然です。<br>では、「ゲーム全体のスコア」や「ゲームオーバーかどうかの判定」はどうでしょうか？ プレイヤーが知っているのは少し不自然ですし、敵が知っているのも変です。</p>
+            <p class="text-slate-300 mb-4">そこで、ゲーム全体を神の視点から俯瞰し、管理する存在が必要になります。ここではそれを <strong><code>GameMaster</code></strong> と呼ぶことにしましょう。これにより、必要なクラスの候補が見えてきます。</p>
+            <ul class="list-disc ml-6 text-slate-300 mb-6">
+                <li><strong>Player</strong></li>
+                <li><strong>Enemy</strong></li>
+                <li><strong>Bullet</strong></li>
+                <li><strong>GameMaster</strong></li>
+            </ul>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.2.2 各クラスの責務を考える</h3>
+            <p class="text-slate-300 mb-4">次に、先ほどの問いに対する「設計の答え」を考えてみます。設計に「絶対にこれしかない」という正解はありませんが、今回は以下のように<strong>責務（責任を持って処理する範囲）</strong>を分担してみましょう。</p>
+            <p class="text-slate-300 mb-6">特に重要なのは<strong>「誰がHIT判定（当たり判定）をするのか」</strong>という問題です。<br>Playerが判定する？ Enemyが判定する？ Bulletが判定する？<br>当たり判定は「弾丸」と「敵」という別々のオブジェクト同士の位置関係を調整する処理です。もしBulletが判定する場合、Bulletは「すべてのEnemyの位置」を知らなければならず、コードが複雑に絡み合ってしまいます。<br>そこで今回は、すべてのオブジェクトのリストを管理している <strong><code>GameMaster</code></strong> に当たり判定の責務を持たせる設計にします。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.2.3 責務分担の視覚化</h3>
+            <p class="text-slate-300 mb-4">それぞれのクラスが何を担当するのか、構造を図にしてみました。</p>
+
+            <svg viewBox="0 0 800 350" class="diagram">
+                <style>
+                    .node-title { fill: #f8fafc; font-weight: bold; font-size: 16px; }
+                    .node-text { fill: #cbd5e1; font-size: 14px; }
+                    .line { stroke: #475569; stroke-width: 2; fill: none; }
+                </style>
+                <rect x="20" y="20" width="160" height="130" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                <text x="100" y="45" class="node-title" text-anchor="middle">Player</text>
+                <text x="70" y="75" class="node-text">位置・HP</text>
+                <text x="70" y="100" class="node-text">移動処理</text>
+                <text x="70" y="125" class="node-text">弾を撃つ</text>
+                <rect x="200" y="20" width="160" height="105" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                <text x="280" y="45" class="node-title" text-anchor="middle">Enemy</text>
+                <text x="250" y="75" class="node-text">位置・HP</text>
+                <text x="250" y="100" class="node-text">移動処理</text>
+                <rect x="380" y="20" width="160" height="105" rx="8" fill="#1e293b" stroke="#eab308" stroke-width="2"/>
+                <text x="460" y="45" class="node-title" text-anchor="middle">Bullet</text>
+                <text x="430" y="75" class="node-text">位置・速度</text>
+                <text x="430" y="100" class="node-text">移動処理</text>
+                <rect x="560" y="20" width="220" height="205" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="2"/>
+                <text x="670" y="45" class="node-title" text-anchor="middle">GameMaster</text>
+                <text x="610" y="75" class="node-text">Playerの保持</text>
+                <text x="610" y="100" class="node-text">複数のEnemyの管理</text>
+                <text x="610" y="125" class="node-text">複数のBulletの管理</text>
+                <text x="610" y="150" class="node-text">当たり判定</text>
+                <text x="610" y="175" class="node-text">スコア管理</text>
+                <text x="610" y="200" class="node-text">ゲーム状態（タイトル等）</text>
+            </svg>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.2.4 メソッドを考える</h3>
+            <p class="text-slate-300 mb-4">それぞれのクラスの責務が決まったら、どんなメソッドを用意すればいいかを考えてみましょう。</p>
+            <p class="text-slate-300 mb-6">例えば <code>Player</code> は、キーボード入力で移動し、スペースキーで弾を撃ちたい。だから <code>move()</code> と <code>shoot()</code> が必要になりそうです。また、すべてのオブジェクトはPyxelのゲームループに合わせて更新・描画される必要があるため、共通して <code>update()</code> と <code>draw()</code> を持つと統一感が出ます。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.2.5 「可用性」という考え方 (ちょっと発展)</h3>
+            <p class="text-slate-300 mb-4">ここで<strong>「可用性（利用できる状態になっているか）」</strong>や<strong>「インターフェース」</strong>という考え方に触れておきましょう。<br>例えば、<code>GameMaster</code> が <code>Player</code> を移動させる時、<code>GameMaster</code> が直接 <code>player.x -= 2</code> と書き換える設計にすることもできます。しかしこれだと、<code>GameMaster</code> は「<code>Player</code> は内部に <code>x</code> という変数を持っている」という<strong>内部の仕組みに依存</strong>してしまいます。</p>
+            <p class="text-slate-300 mb-6">もし将来「Playerはx,y座標じゃなくて、ベクトルで管理しよう」と変更した場合、GameMaster側のコードも書き直さなければなりません。<br>そうではなく、Playerの中に <code>move()</code> というメソッドを用意し、GameMasterからは <code>player.move()</code> を呼び出すだけにします。こうすれば、移動の具体的な仕組みはPlayerの中に隠す（<strong>カプセル化</strong>する）ことができます。これも、責任の所在を明らかにできる重要な考え方です</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.2.6 可用性を表にする</h3>
+            <p class="text-slate-300 mb-4">「外部から操作できること（メソッド）」と、「内部で管理すべきデータ（属性）」を明確に分けましょう。</p>
+
+            <div class="table-wrap mb-8">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-800 border-b border-slate-700">
+                            <th class="p-3 font-semibold">オブジェクト</th>
+                            <th class="p-3 font-semibold text-blue-400">外部から使う操作（メソッド）</th>
+                            <th class="p-3 font-semibold text-emerald-400">内部で管理するもの（属性）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-slate-900 border-b border-slate-800">
+                            <td class="p-3 font-medium">Player</td>
+                            <td class="p-3"><code>update()</code>, <code>draw()</code>, <code>move()</code>, <code>shoot()</code></td>
+                            <td class="p-3"><code>x</code>, <code>y</code>, <code>hp</code>, <code>speed</code>, <code>w</code>, <code>h</code></td>
+                        </tr>
+                        <tr class="bg-slate-900 border-b border-slate-800">
+                            <td class="p-3 font-medium">Enemy</td>
+                            <td class="p-3"><code>update()</code>, <code>draw()</code></td>
+                            <td class="p-3"><code>x</code>, <code>y</code>, <code>hp</code>, <code>speed</code>, <code>w</code>, <code>h</code></td>
+                        </tr>
+                        <tr class="bg-slate-900 border-b border-slate-800">
+                            <td class="p-3 font-medium">Bullet</td>
+                            <td class="p-3"><code>update()</code>, <code>draw()</code></td>
+                            <td class="p-3"><code>x</code>, <code>y</code>, <code>speed</code>, <code>w</code>, <code>h</code></td>
+                        </tr>
+                        <tr class="bg-slate-900">
+                            <td class="p-3 font-medium">GameMaster</td>
+                            <td class="p-3"><code>run()</code>, <code>update()</code>, <code>draw()</code>, <code>check_collision()</code></td>
+                            <td class="p-3"><code>score</code>, <code>game_state</code>, 各種リスト</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 900 430"
+     class="w-full h-auto rounded-lg shadow-lg border border-slate-700 bg-slate-900">
+
+  <style>
+    .bg-card {
+      fill: #1e293b;
+      stroke-width: 2;
+    }
+
+    .title-gm,
+    .title-pl,
+    .title-en,
+    .title-bu {
+      font-family: sans-serif;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .title-gm { fill: #34d399; }
+    .title-pl { fill: #38bdf8; }
+    .title-en { fill: #f87171; }
+    .title-bu { fill: #fbbf24; }
+
+    .section-head {
+      fill: #94a3b8;
+      font-family: sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: .05em;
+    }
+
+    .item-text {
+      fill: #e2e8f0;
+      font-family: sans-serif;
+      font-size: 11px;
+    }
+
+    .conn-line {
+      stroke: #64748b;
+      stroke-width: 2;
+      stroke-dasharray: 4 4;
+      fill: none;
+    }
+
+    .conn-arrow {
+      fill: #64748b;
+    }
+
+    .badge-text {
+      fill: #0f172a;
+      font-family: sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <marker id="arrowhead"
+            viewBox="0 0 11 11"
+            refX="7"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" class="conn-arrow"/>
+    </marker>
+  </defs>
+
+  <!-- ====================================================== -->
+  <!-- GameMaster -->
+  <!-- ====================================================== -->
+
+  <g transform="translate(270,20)">
+    <rect width="400"
+          height="165"
+          rx="8"
+          class="bg-card"
+          stroke="#10b981"/>
+
+    <rect width="400"
+          height="32"
+          rx="8"
+          fill="#064e3b"
+          opacity="0.6"/>
+
+    <text x="200"
+          y="22"
+          text-anchor="middle"
+          class="title-gm">
+      GameMaster（全体管理）
+    </text>
+
+    <text x="15" y="55" class="section-head">
+      【 保持するオブジェクト（属性）】
+    </text>
+
+    <text x="20" y="80" class="item-text">
+      • self.player（Player 1体）
+    </text>
+
+    <text x="20" y="105" class="item-text">
+      • self.enemies
+      <tspan x="35" dy="15">
+        （リスト [Enemy, Enemy, ...]）
+      </tspan>
+    </text>
+
+    <text x="20" y="140" class="item-text">
+      • self.bullets
+      <tspan x="35" dy="15">
+        （リスト [Bullet, Bullet, ...]）
+      </tspan>
+    </text>
+
+    <text x="210" y="55" class="section-head">
+      【 主な役割（メソッド）】
+    </text>
+
+    <text x="215" y="80" class="item-text">
+      • __init__() （Pyxel初期化）
+    </text>
+
+    <text x="215" y="105" class="item-text">
+      • update() （全オブジェクト更新）
+    </text>
+
+    <text x="215" y="130" class="item-text">
+      • draw() （全オブジェクト描画）
+    </text>
+
+    <text x="215" y="155" class="item-text">
+      • check_collision()
+    </text>
+  </g>
+
+  <!-- ====================================================== -->
+  <!-- 関係線 -->
+  <!-- ====================================================== -->
+
+  <path d="M340 185 L180 245"
+        class="conn-line"
+        marker-end="url(#arrowhead)"/>
+
+  <rect x="235" y="205"
+        width="55"
+        height="22"
+        rx="4"
+        fill="#38bdf8"/>
+
+  <text x="262"
+        y="220"
+        text-anchor="middle"
+        class="badge-text">
+    1 : 1
+  </text>
+
+  <path d="M450 185 L450 245"
+        class="conn-line"
+        marker-end="url(#arrowhead)"/>
+
+  <rect x="422"
+        y="205"
+        width="55"
+        height="22"
+        rx="4"
+        fill="#f87171"/>
+
+  <text x="450"
+        y="220"
+        text-anchor="middle"
+        class="badge-text">
+    1 : N
+  </text>
+
+  <path d="M560 185 L720 245"
+        class="conn-line"
+        marker-end="url(#arrowhead)"/>
+
+  <rect x="610"
+        y="205"
+        width="55"
+        height="22"
+        rx="4"
+        fill="#fbbf24"/>
+
+  <text x="637"
+        y="220"
+        text-anchor="middle"
+        class="badge-text">
+    1 : N
+  </text>
+
+  <!-- ====================================================== -->
+  <!-- Player -->
+  <!-- ====================================================== -->
+
+  <g transform="translate(20,245)">
+    <rect width="250"
+          height="185"
+          rx="8"
+          class="bg-card"
+          stroke="#38bdf8"/>
+
+    <rect width="250"
+          height="30"
+          rx="8"
+          fill="#0c4a6e"
+          opacity="0.6"/>
+
+    <text x="125"
+          y="20"
+          text-anchor="middle"
+          class="title-pl">
+      Player（自機）
+    </text>
+
+    <text x="12" y="52" class="section-head">
+      【 内部属性 】
+    </text>
+
+    <text x="15" y="75" class="item-text">
+      x, y （位置）
+    </text>
+
+    <text x="15" y="95" class="item-text">
+      w, h （8×8）
+    </text>
+
+    <text x="15" y="115" class="item-text">
+      speed = 2
+    </text>
+
+    <text x="15" y="135" class="item-text">
+      hp = 3
+    </text>
+
+    <text x="12" y="155" class="section-head">
+      【 操作（メソッド）】
+    </text>
+
+    <text x="15" y="178" class="item-text">
+      move(), update(), draw()
+    </text>
+  </g>
+
+  <!-- ====================================================== -->
+  <!-- Enemy -->
+  <!-- ====================================================== -->
+
+  <g transform="translate(325,245)">
+    <rect width="250"
+          height="185"
+          rx="8"
+          class="bg-card"
+          stroke="#f87171"/>
+
+    <rect width="250"
+          height="30"
+          rx="8"
+          fill="#7f1d1d"
+          opacity="0.6"/>
+
+    <text x="125"
+          y="20"
+          text-anchor="middle"
+          class="title-en">
+      Enemy（敵）
+    </text>
+
+    <text x="12" y="52" class="section-head">
+      【 内部属性 】
+    </text>
+
+    <text x="15" y="75" class="item-text">
+      x, y （位置）
+    </text>
+
+    <text x="15" y="95" class="item-text">
+      w, h （8×8）
+    </text>
+
+    <text x="15" y="115" class="item-text">
+      speed = 1
+    </text>
+
+    <text x="15" y="135" class="item-text">
+      hp = 1
+    </text>
+
+    <text x="12" y="155" class="section-head">
+      【 操作（メソッド）】
+    </text>
+
+    <text x="15" y="178" class="item-text">
+      update(), draw()
+    </text>
+  </g>
+
+  <!-- ====================================================== -->
+  <!-- Bullet -->
+  <!-- ====================================================== -->
+
+  <g transform="translate(630,245)">
+    <rect width="250"
+          height="185"
+          rx="8"
+          class="bg-card"
+          stroke="#fbbf24"/>
+
+    <rect width="250"
+          height="30"
+          rx="8"
+          fill="#78350f"
+          opacity="0.6"/>
+
+    <text x="125"
+          y="20"
+          text-anchor="middle"
+          class="title-bu">
+      Bullet（弾丸）
+    </text>
+
+    <text x="12" y="52" class="section-head">
+      【 内部属性 】
+    </text>
+
+    <text x="15" y="75" class="item-text">
+      x, y （位置）
+    </text>
+
+    <text x="15" y="95" class="item-text">
+      w, h （2×4）
+    </text>
+
+    <text x="15" y="115" class="item-text">
+      speed = 4
+    </text>
+
+    <text x="12" y="155" class="section-head">
+      【 操作（メソッド）】
+    </text>
+
+    <text x="15" y="178" class="item-text">
+      update(), draw()
+    </text>
+  </g>
+
+</svg>
+        </section>
+
+        <!-- 5.3 -->
+        <section id="section-5-3" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">5.3 クラスを実装する</h2>
+            <p class="text-slate-300 mb-4">設計図ができたので、いよいよコードを書いていきます。段階的に追加していくことで、「なぜこのコードが必要なのか」を確認しましょう。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.3.1 Playerクラス</h3>
+            <p class="text-slate-300 mb-4">まずは <code>Player</code> クラスです。初期化メソッド <code>__init__</code> で属性を定義し、WASDキー（または方向キー）での移動を実装します。</p>
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Player:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.w = 8
+        self.h = 8
+        self.speed = 2
+        self.hp = 3
+
+    def move(self):
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_A):
+            self.x -= self.speed
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D):
+            self.x += self.speed
+        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_W):
+            self.y -= self.speed
+        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S):
+            self.y += self.speed
+
+    def update(self):
+        self.move()
+
+    def draw(self):
+        # プレイヤーは緑色(11)の四角形
+        pyxel.rect(self.x, self.y, self.w, self.h, 11)</code></pre>
+            </div>
+            <p class="text-slate-300 mb-6">クラスの設計通り、<code>self.x</code> や <code>self.y</code> を使って自分自身の状態を管理していますね。<code>pyxel.KEY_A</code> などはPyxel側であらかじめ用意されているキーボード定数です。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.3.2 Bulletクラス</h3>
+            <p class="text-slate-300 mb-4">次に、弾丸クラスです。弾丸は生成された後、上に向かって飛んでいきます。</p>
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Bullet:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.w = 2
+        self.h = 4
+        self.speed = 4
+
+    def update(self):
+        # 上方向（yが減る方向）に移動
+        self.y -= self.speed
+
+    def draw(self):
+        # 弾丸は黄色(10)
+        pyxel.rect(self.x, self.y, self.w, self.h, 10)</code></pre>
+            </div>
+            <p class="text-slate-300 mb-6">ここで重要な問題に気づきます。「弾丸は1発ではなく、撃つたびに何発も増えていく」ということです。つまり、後で複数のBulletを管理する仕組みが必要になります。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.3.3 Enemyクラス</h3>
+            <p class="text-slate-300 mb-4">敵クラスです。今回はシンプルに上から下へ移動するだけにします。</p>
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Enemy:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.w = 8
+        self.h = 8
+        self.speed = 1
+        self.hp = 1
+
+    def update(self):
+        # 下方向に移動
+        self.y += self.speed
+
+    def draw(self):
+        # 敵は赤色(8)
+        pyxel.rect(self.x, self.y, self.w, self.h, 8)</code></pre>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.3.4 GameMasterクラスの骨格</h3>
+            <p class="text-slate-300 mb-4">これらを取りまとめる <code>GameMaster</code> を作成します。Pyxelのシステム機能もここで呼び出します。</p>
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class GameMaster:
+    def __init__(self):
+        pyxel.init(160, 120, title="Shooting Game")
+
+        # プレイヤーを生成して保持
+        self.player = Player(76, 100)
+
+        # 敵や弾丸は複数あるので「リスト」で管理する
+        self.enemies = []
+        self.bullets = []
+
+        # runを呼ぶとゲームループ開始
+        pyxel.run(self.update, self.draw)
+
+    def update(self):
+        self.player.update()
+
+        for bullet in self.bullets:
+            bullet.update()
+
+        for enemy in self.enemies:
+            enemy.update()
+
+    def draw(self):
+        pyxel.cls(0) # 画面クリア
+        self.player.draw()
+
+        for bullet in self.bullets:
+            bullet.draw()
+
+        for enemy in self.enemies:
+            enemy.draw()
+
+# ゲーム起動
+# game = GameMaster()</code></pre>
+            </div>
+            <p class="text-slate-300 mb-6"><code>self.enemies = []</code> のように空のリストを用意し、<code>for</code> 文を使ってリストの中身すべてに対して <code>update()</code> や <code>draw()</code> を呼び出している点に注目してください。</p>
+        </section>
+
+        <!-- 5.4 -->
+        <section id="section-5-4" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">5.4 オブジェクトを増やす</h2>
+            <p class="text-slate-300 mb-6">GameMasterの準備ができたので、実際にリストへオブジェクトを追加・削除する処理を実装します。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">弾を撃つ（Player側からBulletを増やす）</h3>
+            <p class="text-slate-300 mb-4">スペースキーを押したときに弾を生成したいのですが、Bulletリストは <code>GameMaster</code> が持っています。そのため、少し工夫が必要です。GameMasterのupdate内で以下のように処理します。</p>
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python"># GameMasterのupdate内に追加
+if pyxel.btnp(pyxel.KEY_SPACE):
+    # プレイヤーの中央から弾を生成
+    new_bullet = Bullet(self.player.x + 3, self.player.y)
+    self.bullets.append(new_bullet)</code></pre>
+            </div>
+
+            <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                <p class="font-bold text-emerald-400 mb-3 text-lg">💡 新しい関数・構文の解説</p>
+                <ul class="list-disc ml-5 text-sm text-slate-300 space-y-2">
+                    <li><code>pyxel.btnp(key)</code> : <code>btn()</code>と違い、キーが「押された瞬間」だけ <code>True</code> になります。長押しで連続発射されるのを防ぎます。</li>
+                    <li><code>list.append(要素)</code> : Pythonのリストの末尾に、新しい要素を追加します。</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">不要になったオブジェクトを消す</h3>
+            <p class="text-slate-300 mb-4">画面外に出た弾丸や敵をいつまでもリストに残しておくと、メモリを無駄遣いし動作が重くなります。そのため、リストから削除する処理を <code>update()</code> に追加します。</p>
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python"># 画面外に出た弾を削除
+for bullet in self.bullets[:]: # リストのコピーを回す
+    if bullet.y &lt; -10:
+        self.bullets.remove(bullet)</code></pre>
+            </div>
+            <p class="text-slate-300 mb-6">※ <code>remove()</code> はリストから指定した要素を削除するメソッドです。ループ中に要素を削除する際は <code>[:]</code> を使ってリストのコピーを回すのがPythonのセオリーです。</p>
+        </section>
+
+        <!-- 5.5 -->
+        <section id="section-5-5" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">5.5 当たり判定</h2>
+            <p class="text-slate-300 mb-6">シューティングゲームの要である「当たり判定（Collision Detection）」です。今回は「矩形（四角形）」同士が重なっているかを判定します。</p>
+
+            <div class="bg-slate-950 p-6 rounded-lg border border-slate-800 mb-6 overflow-x-auto">
+                <svg viewBox="0 0 500 300" class="w-full max-w-2xl mx-auto">
+                    <rect x="100" y="80" width="120" height="100" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="2"/>
+                    <text x="110" y="100" fill="#ef4444" font-weight="bold">Enemy (e)</text>
+                    <text x="100" y="70" fill="#94a3b8" font-size="12">e.x, e.y</text>
+                    <rect x="170" y="150" width="80" height="80" fill="rgba(234,179,8,0.3)" stroke="#eab308" stroke-width="2"/>
+                    <text x="180" y="170" fill="#eab308" font-weight="bold">Bullet (b)</text>
+                    <line x1="170" y1="150" x2="170" y2="40" stroke="#cbd5e1" stroke-dasharray="4" stroke-width="1"/>
+                    <text x="175" y="55" fill="#cbd5e1" font-size="12">b.x</text>
+                    <line x1="220" y1="80" x2="220" y2="40" stroke="#cbd5e1" stroke-dasharray="4" stroke-width="1"/>
+                    <text x="225" y="55" fill="#cbd5e1" font-size="12">e.x + e.w</text>
+                    <text x="280" y="100" fill="#f8fafc" font-size="14">弾の左端 (b.x) が</text>
+                    <text x="280" y="125" fill="#f8fafc" font-size="14">敵の右端 (e.x + e.w) より左にある</text>
+                    <text x="280" y="150" fill="#f8fafc" font-size="14">AND その他の3方向も満たす時</text>
+                    <text x="280" y="180" fill="#38bdf8" font-size="16" font-weight="bold">⇒ 重なっている！</text>
+                </svg>
+            </div>
+
+            <p class="text-slate-300 mb-4">2つの四角形が重なっている条件は、以下の4つを<strong>すべて満たす</strong>ことです。</p>
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">def check_collision(self):
+    for enemy in self.enemies[:]:
+        for bullet in self.bullets[:]:
+            # 矩形同士の当たり判定
+            if (bullet.x &lt; enemy.x + enemy.w and
+                bullet.x + bullet.w &gt; enemy.x and
+                bullet.y &lt; enemy.y + enemy.h and
+                bullet.y + bullet.h &gt; enemy.y):
+
+                # 当たった場合の処理
+                enemy.hp -= 1
+                self.bullets.remove(bullet)
+
+                if enemy.hp &lt;= 0:
+                    self.enemies.remove(enemy)
+                    self.score += 10 # GameMasterがスコアを管理</code></pre>
+            </div>
+            <p class="text-slate-300 mb-6">5.2の設計で決めた通り、この判定処理は特定のキャラクターではなく <code>GameMaster</code> に持たせています。それにより、リスト内の要素を自由にチェックしたり削除したり、スコアを加算したりすることが可能になっています。</p>
+        </section>
+
+        <!-- 5.6 -->
+        <section id="section-5-6" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">5.6 ゲームらしくする</h2>
+            <p class="text-slate-300 mb-6">敵のランダム出現、ゲームオーバー、タイトル画面といった「ゲームの流れ（状態遷移）」を実装します。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">ゲームの状態遷移（ステート）</h3>
+            <p class="text-slate-300 mb-4">ゲームは常にプレイ中なわけではありません。タイトル画面、プレイ画面、ゲームオーバー画面といった「状態」をGameMasterに管理させます。</p>
+
+            <svg viewBox="0 0 600 150" class="diagram">
+                <defs>
+                    <marker id="arrow-state" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#cbd5e1" />
+                    </marker>
+                </defs>
+                <rect x="50" y="50" width="120" height="50" rx="25" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+                <text x="110" y="80" fill="#f8fafc" font-weight="bold" text-anchor="middle">TITLE</text>
+                <rect x="240" y="50" width="120" height="50" rx="25" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+                <text x="300" y="80" fill="#f8fafc" font-weight="bold" text-anchor="middle">PLAY</text>
+                <rect x="430" y="50" width="120" height="50" rx="25" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                <text x="490" y="80" fill="#f8fafc" font-weight="bold" text-anchor="middle">GAMEOVER</text>
+                <path d="M 170 75 L 230 75" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow-state)"/>
+                <text x="200" y="65" fill="#94a3b8" font-size="10" text-anchor="middle">SPACEキー</text>
+                <path d="M 360 75 L 420 75" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow-state)"/>
+                <text x="390" y="65" fill="#94a3b8" font-size="10" text-anchor="middle">HP == 0</text>
+                <path d="M 490 100 Q 300 140 110 100" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow-state)"/>
+                <text x="300" y="140" fill="#94a3b8" font-size="10" text-anchor="middle">SPACEキーでリスタート</text>
+            </svg>
+
+            <p class="text-slate-300 mb-6">GameMasterの <code>__init__</code> で <code>self.game_state = "TITLE"</code> としておき、<code>update</code> と <code>draw</code> の中で <code>if</code> 文を使って処理を分岐させます。</p>
+
+            <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                <p class="font-bold text-emerald-400 mb-3 text-lg">💡 新しいモジュールと関数</p>
+                <ul class="list-disc ml-5 text-sm text-slate-300 space-y-2">
+                    <li><code>import random</code> : 乱数（ランダムな値）を扱うための標準モジュールを読み込みます。</li>
+                    <li><code>random.randint(a, b)</code> : <code>a</code> から <code>b</code> の範囲でランダムな整数を返します。</li>
+                    <li><code>pyxel.frame_count</code> : ゲーム開始から何フレーム経過したかを表す変数です。<code>if pyxel.frame_count % 30 == 0:</code> のように書くと一定間隔で処理できます。</li>
+                    <li><code>pyxel.text(x, y, "文字", color)</code> : 画面にテキストを描画します。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 5.7 -->
+        <section id="section-5-7" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">5.7 継承を使って設計を整理する</h2>
+            <p class="text-slate-300 mb-4">さて、ここまででゲームに必要な要素はほぼ出揃いました。しかし、<code>Player</code> クラスと <code>Enemy</code> クラスのコードを見比べてみてください。</p>
+            <p class="text-slate-300 mb-4">どちらも <code>x, y, w, h, speed, hp</code> という属性を持ち、<code>update()</code> と <code>draw()</code> というメソッドを持っています。<strong>「同じようなコードを2回書く必要があるだろうか？」</strong>という疑問が湧きませんか？</p>
+            <p class="text-slate-300 mb-6">ここで、前章で学んだ<strong>継承</strong>の出番です。共通する要素を <code>Character</code> クラスとして抽出し、それを継承することで設計を整理（リファクタリング）します。</p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">5.7.1 継承によって何が変わったのか</h3>
+            <svg viewBox="0 0 700 280" class="diagram">
+                <style>
+                    .cls-box { fill: #1e293b; stroke-width: 2; }
+                    .cls-title { fill: #f8fafc; font-weight: bold; font-size: 16px; }
+                    .cls-attr { fill: #cbd5e1; font-size: 14px; }
+                </style>
+                <text x="50" y="30" fill="#94a3b8" font-size="14" font-weight="bold">【Before】</text>
+                <rect x="50" y="50" width="130" height="150" class="cls-box" stroke="#3b82f6" rx="8"/>
+                <text x="115" y="75" class="cls-title" text-anchor="middle">Player</text>
+                <text x="65" y="105" class="cls-attr">- x, y</text>
+                <text x="65" y="125" class="cls-attr">- w, h</text>
+                <text x="65" y="145" class="cls-attr">- speed, hp</text>
+                <text x="65" y="165" class="cls-attr">- draw()</text>
+                <text x="65" y="185" class="cls-attr">- move()</text>
+                <rect x="200" y="50" width="130" height="130" class="cls-box" stroke="#ef4444" rx="8"/>
+                <text x="265" y="75" class="cls-title" text-anchor="middle">Enemy</text>
+                <text x="215" y="105" class="cls-attr">- x, y</text>
+                <text x="215" y="125" class="cls-attr">- w, h</text>
+                <text x="215" y="145" class="cls-attr">- speed, hp</text>
+                <text x="215" y="165" class="cls-attr">- draw()</text>
+                <line x1="350" y1="120" x2="380" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-state)"/>
+                <text x="400" y="30" fill="#38bdf8" font-size="14" font-weight="bold">【After：継承で共通化】</text>
+                <rect x="480" y="50" width="130" height="120" class="cls-box" stroke="#a855f7" rx="8"/>
+                <text x="545" y="75" class="cls-title" text-anchor="middle">Character</text>
+                <text x="495" y="105" class="cls-attr">- x, y, w, h</text>
+                <text x="495" y="125" class="cls-attr">- speed, hp</text>
+                <text x="495" y="145" class="cls-attr">- draw(color)</text>
+                <path d="M 545 170 L 545 190" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+                <path d="M 465 190 L 625 190" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+                <path d="M 465 190 L 465 210" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow-state)"/>
+                <path d="M 625 190 L 625 210" fill="none" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow-state)"/>
+                <rect x="410" y="220" width="110" height="50" class="cls-box" stroke="#3b82f6" rx="8"/>
+                <text x="465" y="245" class="cls-title" text-anchor="middle">Player</text>
+                <text x="465" y="265" class="cls-attr" text-anchor="middle">- move()</text>
+                <rect x="570" y="220" width="110" height="50" class="cls-box" stroke="#ef4444" rx="8"/>
+                <text x="625" y="245" class="cls-title" text-anchor="middle">Enemy</text>
+                <text x="625" y="265" class="cls-attr" text-anchor="middle">- auto_move()</text>
+            </svg>
+
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Character:
+    def __init__(self, x, y, speed, hp):
+        self.x = x
+        self.y = y
+        self.w = 8
+        self.h = 8
+        self.speed = speed
+        self.hp = hp
+
+    def draw(self, color):
+        pyxel.rect(self.x, self.y, self.w, self.h, color)</code></pre>
+            </div>
+            <p class="text-slate-300 mb-6">共通部分を一箇所にまとめることで、重複したコードが減り、バグの温床を減らすことができます。<code>Player</code> や <code>Enemy</code> は <code>Character</code> を継承し、それぞれ固有の処理だけを記述すればよくなります。</p>
+        </section>
+
+        <!-- 最終コード -->
+        <section id="section-final" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">最終コード</h2>
+            <p class="text-slate-300 mb-6">ここまで学んだ「責務の分割」「状態遷移」「継承」をすべて盛り込んだ、実際に遊べる完成版のコードです。どの部分がこれまで説明した内容に対応しているか、確認しながら読んでみてください。</p>
+
+            <div class="code-container mb-6 w-full">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">import pyxel
+import random
+
+# --- 1. 共通クラス (継承元) ---
+class Character:
+    def __init__(self, x, y, speed, hp):
+        self.x = x
+        self.y = y
+        self.w = 8
+        self.h = 8
+        self.speed = speed
+        self.hp = hp
+
+    def draw(self, color):
+        pyxel.rect(self.x, self.y, self.w, self.h, color)
+
+# --- 2. Playerクラス (Characterを継承) ---
+class Player(Character):
+    def __init__(self, x, y):
+        # 親クラスの初期化を呼び出す
+        super().__init__(x, y, speed=2, hp=3)
+
+    def move(self):
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_A):
+            self.x = max(self.x - self.speed, 0)
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D):
+            self.x = min(self.x + self.speed, 160 - self.w)
+        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_W):
+            self.y = max(self.y - self.speed, 0)
+        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.KEY_S):
+            self.y = min(self.y + self.speed, 120 - self.h)
+
+    def update(self):
+        self.move()
+
+    def draw(self):
+        super().draw(11) # 緑色で描画
+
+# --- 3. Enemyクラス (Characterを継承) ---
+class Enemy(Character):
+    def __init__(self, x, y):
+        super().__init__(x, y, speed=1, hp=1)
+
+    def update(self):
+        self.y += self.speed
+
+    def draw(self):
+        super().draw(8) # 赤色で描画
+
+# --- 4. Bulletクラス ---
+class Bullet:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.w = 2
+        self.h = 4
+        self.speed = 4
+
+    def update(self):
+        self.y -= self.speed
+
+    def draw(self):
+        pyxel.rect(self.x, self.y, self.w, self.h, 10) # 黄色
+
+# --- 5. GameMasterクラス (全体管理) ---
+class GameMaster:
+    def __init__(self):
+        pyxel.init(160, 120, title="Shooting Game")
+        self.reset_game()
+        pyxel.run(self.update, self.draw)
+
+    def reset_game(self):
+        self.game_state = "TITLE"
+        self.player = Player(76, 100)
+        self.enemies = []
+        self.bullets = []
+        self.score = 0
+
+    def update(self):
+        # 状態による分岐
+        if self.game_state == "TITLE":
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.game_state = "PLAY"
+
+        elif self.game_state == "PLAY":
+            self.update_play()
+
+        elif self.game_state == "GAMEOVER":
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.reset_game()
+
+    def update_play(self):
+        # プレイヤーの更新
+        self.player.update()
+
+        # 弾の発射
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            self.bullets.append(Bullet(self.player.x + 3, self.player.y))
+
+        # 敵のランダム生成
+        if pyxel.frame_count % 30 == 0:
+            ex = random.randint(0, 160 - 8)
+            self.enemies.append(Enemy(ex, -10))
+
+        # 弾の更新と削除
+        for bullet in self.bullets[:]:
+            bullet.update()
+            if bullet.y < -10:
+                self.bullets.remove(bullet)
+
+        # 敵の更新と削除
+        for enemy in self.enemies[:]:
+            enemy.update()
+            if enemy.y > 120:
+                self.enemies.remove(enemy)
+
+        # 当たり判定
+        self.check_collision()
+
+        # ゲームオーバー判定
+        if self.player.hp <= 0:
+            self.game_state = "GAMEOVER"
+
+    def check_collision(self):
+        # 弾と敵
+        for enemy in self.enemies[:]:
+            for bullet in self.bullets[:]:
+                if (bullet.x < enemy.x + enemy.w and
+                    bullet.x + bullet.w > enemy.x and
+                    bullet.y < enemy.y + enemy.h and
+                    bullet.y + bullet.h > enemy.y):
+
+                    if bullet in self.bullets:
+                        self.bullets.remove(bullet)
+                    enemy.hp -= 1
+
+                    if enemy.hp <= 0:
+                        if enemy in self.enemies:
+                            self.enemies.remove(enemy)
+                        self.score += 10
+
+        # プレイヤーと敵
+        for enemy in self.enemies[:]:
+            if (self.player.x < enemy.x + enemy.w and
+                self.player.x + self.player.w > enemy.x and
+                self.player.y < enemy.y + enemy.h and
+                self.player.y + self.player.h > enemy.y):
+
+                self.player.hp -= 1
+                self.enemies.remove(enemy)
+
+    def draw(self):
+        pyxel.cls(0)
+
+        if self.game_state == "TITLE":
+            pyxel.text(55, 50, "SHOOTING GAME", 7)
+            pyxel.text(45, 70, "PRESS SPACE TO START", 5)
+
+        elif self.game_state == "PLAY":
+            self.player.draw()
+            for bullet in self.bullets:
+                bullet.draw()
+            for enemy in self.enemies:
+                enemy.draw()
+
+            # UI描画
+            pyxel.text(5, 5, f"SCORE:{self.score}", 7)
+            pyxel.text(120, 5, f"HP:{self.player.hp}", 8)
+
+        elif self.game_state == "GAMEOVER":
+            pyxel.text(60, 50, "GAME OVER", 8)
+            pyxel.text(45, 70, "PRESS SPACE TO RESTART", 5)
+
+# ゲーム起動
+if __name__ == "__main__":
+    game = GameMaster()</code></pre>
+            </div>
+
+            <div class="bg-blue-950/50 border-l-4 border-blue-500 p-5 mb-6 rounded-r-md">
+                <p class="font-bold text-blue-300 mb-2">POINT</p>
+                <p class="text-slate-300">いきなり完成版のコードを見てもさっぱり分からないと思います。しかし、このコードを読み解く能力は既に備わっています。上から順に読み解いていきましょう。分からないところについては質問してください。</p>
+            </div>
+
+            <p class="text-slate-300 leading-relaxed">このコードをコピーして実行し、実際に遊んでみてください。次週は自分でゲーム案を考え、実装する回になります。ゲーム案から設計、必要なクラスやメソッドなどをこの章を参考に考えてみてください。</p>
+        </section>
+
+    </main>
+</div>
+
+<footer class="text-center py-10 mt-10 border-t border-slate-800 bg-slate-900">
+    <div class="text-sm font-bold text-slate-500">
+        IQ Python Workshop 2026 - Python + Pyxel ゲーム開発
+    </div>
+</footer>
+
+<script>
+    hljs.highlightAll();
+
+    function copyCode(element) {
+        const container = element.closest('.code-container');
+        if (!container) return;
+
+        const codeElement = container.querySelector('code');
+        const code = codeElement ? codeElement.innerText : '';
+        const btn = container.querySelector('.copy-btn');
+
+        if (!code) return;
+
+        if (window.getSelection().toString().length > 0 && element.tagName !== 'BUTTON') {
+            return;
+        }
+
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = btn ? btn.innerText : '';
+            if (btn) {
+                btn.innerText = 'Copied!';
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                btn.classList.add('bg-emerald-500');
+            }
+
+            setTimeout(() => {
+                if (btn) {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-emerald-500');
+                    btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                }
+            }, 2000);
+        }).catch(err => {
+            console.error('Copy failed: ', err);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.toc-link');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+
+                navLinks.forEach(link => {
+                    link.classList.remove('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                    link.classList.add('text-slate-400', 'border-transparent');
+
+                    if (link.getAttribute('href').slice(1) === entry.target.id) {
+                        link.classList.add('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                        link.classList.remove('text-slate-400', 'border-transparent');
+                    }
+                });
+            });
+        }, {
+            rootMargin: '-20% 0px -70% 0px'
+        });
+
+        sections.forEach(section => observer.observe(section));
+    });
+</script>
+</body>
+</html>
