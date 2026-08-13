@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>クラス2 ― ゲームをクラスで設計する | IQ Python Workshop</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #e2e8f0; /* slate-200 */
+            scroll-behavior: smooth;
+        }
+
+        /* コードブロックのカスタマイズ */
+        pre {
+            margin: 0 !important;
+            padding: 1.25rem !important;
+            border-radius: 0.5rem;
+            background: #1e293b !important; /* slate-800 */
+            font-size: 0.9rem;
+            overflow-x: auto;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #334155;
+            transition: border-color 0.2s ease;
+        }
+        
+        pre:hover {
+            border-color: #60a5fa; /* hover時に青い枠線 */
+        }
+
+        code.hljs {
+            font-family: 'Consolas', 'Monaco', 'Ubuntu Mono', monospace !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+        
+        .code-container {
+            position: relative;
+            height: 100%;
+        }
+
+        @media (hover: hover) {
+            pre:hover::after {
+                content: 'Tap to Copy';
+                position: absolute;
+                bottom: 10px;
+                right: 15px;
+                font-size: 0.75rem;
+                color: #94a3b8;
+                pointer-events: none;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-10">
+        
+        <!-- 左側：目次（サイドバー） -->
+        <aside class="md:w-64 flex-shrink-0 hidden md:block">
+            <nav id="toc" class="sticky top-10 flex flex-col space-y-1 border-l-2 border-slate-800 pl-4">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">目次</p>
+                <a href="#intro" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">Introduction</a>
+                <a href="#sec3-1" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">3.1 ゲームの登場人物をクラスにする</a>
+                <a href="#sec3-2" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">3.2 Characterクラスを作る</a>
+                <a href="#sec3-3" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">3.3 オブジェクトを管理する</a>
+                <a href="#sec3-4" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">3.4 メソッド同士を連携させる</a>
+                <a href="#sec3-5" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">3.5 オブジェクトの状態を管理する</a>
+                <a href="#sec3-6" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">3.6 ゲームを設計してみよう</a>
+            </nav>
+        </aside>
+
+        <!-- 右側：メインコンテンツ -->
+        <main class="flex-1 space-y-16">
+            
+            <header class="border-b border-slate-800 pb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-100 tracking-tight">3. クラス2 ― ゲームをクラスで設計する</h1>
+                <p class="text-lg text-slate-400 mt-2">文法を超えて「オブジェクト指向的なゲーム設計」の思考法を身につける</p>
+            </header>
+
+            <!-- 実習についての最重要NOTICEボックス -->
+            <div class="bg-amber-950/40 border-l-4 border-amber-500 p-6 rounded-r-lg shadow-lg">
+                <h3 class="text-xl font-bold text-amber-300 mb-3 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    実習についての重要なお知らせ
+                </h3>
+                <p class="text-slate-200 font-medium leading-relaxed">
+                    この章では、コードを読むだけではなく、<strong class="text-white border-b-2 border-amber-400">必ず自分のPCで実行して動作を確認してください。</strong><br><br>
+                    コードを書き写した後、値を変更したり、処理を追加したりして、実際に動作を確かめることが極めて重要です。
+                </p>
+            </div>
+
+            <!-- Introduction -->
+            <section id="intro" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center">
+                    <span class="text-blue-400 mr-2">#</span> Introduction
+                </h2>
+                <div class="prose max-w-none text-slate-300 space-y-4">
+                    <p>第2章では、Pythonにおけるクラスの文法（<code>class</code>, <code>__init__</code>, <code>self</code>, 属性, メソッド）を学びました。</p>
+                    <p>第3章では、これらの文法を使って、<strong>「ゲームの登場人物やアイテムなどの要素を、クラスを使ってどのように捉え、どのように設計していくか」</strong>というプログラミングの「設計思想（設計の考え方）」を学びます。</p>
+                    <p>ゲームの中には、プレイヤー、敵キャラ、武器、回復アイテム、弾丸など、様々な要素が存在します。これらの要素を<strong>「状態（データ）を持ち、それに応じた動作（処理）を行うもの」</strong>として捉え、クラスとして設計していくことが重要です。</p>
+                </div>
+            </section>
+
+            <!-- 3.1 ゲームの登場人物をクラスにする -->
+            <section id="sec3-1" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">3.1 ゲームの登場人物をクラスにする</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    ゲームを作るとき、画面の中には様々な要素が存在します。
+                    例えば、プレイヤー、敵キャラ、武器、回復アイテム、弾丸などです。これらはすべてプログラム上で管理する必要があります。
+                </p>
+
+                <!-- 3.1.1 Player -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.1.1 Player</h3>
+                <p class="text-slate-300 mb-4">
+                    まずは2章で学んだクラスを使って、ゲームの主人公である <code>Player</code> を作成します。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Player:
+    def __init__(self, name, hp, attack_power):
+     self.name = name
+     self.hp = hp
+     self.attack_power = attack_power
+
+    def attack(self):
+        print(self.name, "の攻撃！")
+
+# Playerのインスタンス（オブジェクト）を作成
+Alice = Player("Alice", 100, 20)
+Alice.attack()
+
+</code></pre>
+                </div>
+
+
+
+                <!-- 3.1.2 Enemy -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.1.2 Enemy</h3>
+                <p class="text-slate-300 mb-4">
+                    次に、プレイヤーと戦う敵キャラ <code>Enemy</code> クラスを作成してみましょう。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Enemy:
+    def __init__(self, name, hp, attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    def attack(self):
+        print(self.name, "の攻撃！")
+
+Slime = Enemy("Slime", 50, 10)
+Slime.attack()
+
+</code></pre>
+                </div>
+
+                <p class="text-slate-300 mb-4">
+                    ここで、作成した <code>Player</code> と <code>Enemy</code> のコードを並べてじっくり見比べてみてください。
+                </p>
+
+                <!-- C++とPythonのコード比較的並列カード -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="code-container">
+                        <div class="bg-slate-700 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">Player クラス</div>
+                        <pre class="rounded-t-none"><code class="language-python">class Player:
+    def __init__(self,name,hp,attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    def attack(self):
+        print(self.name, "の攻撃！")</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-slate-700 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">Enemy クラス</div>
+                        <pre class="rounded-t-none"><code class="language-python">class Enemy:
+    def __init__(self,name,hp,attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    def attack(self):
+        print(self.name, "の攻撃！")</code></pre>
+                    </div>
+                </div>
+
+                <p class="text-slate-300 mb-6">
+                    ……お気づきでしょうか？ クラス名こそ違いますが、定義している属性もメソッドも<strong>「かなり似ている（ほぼ同じ）」</strong>状態になっていますね。
+                </p>
+
+                <!-- 3.1.3 「もの」をクラスにする -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.1.3 「もの」をクラスにする</h3>
+                <p class="text-slate-300 mb-4">
+                    そもそも、なぜこれらがクラスになるのでしょうか。ゲームの中に存在する「もの」をプログラムに落とし込む思考プロセスを図で整理してみましょう。
+                </p>
+
+                <!-- SVG 1: ものをクラスにするプロセス -->
+                <svg viewBox="0 0 600 160" class="w-full max-w-xl mx-auto my-8">
+                    <!-- Step 1 -->
+                    <rect x="10" y="20" width="120" height="120" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                    <text x="70" y="55" fill="#f8fafc" font-size="13" font-weight="bold" text-anchor="middle">ゲーム内の「もの」</text>
+                    <text x="70" y="85" fill="#94a3b8" font-size="11" text-anchor="middle">Player, Enemy,</text>
+                    <text x="70" y="105" fill="#94a3b8" font-size="11" text-anchor="middle">Weapon, Bullet...</text>
+
+                    <!-- Arrow 1 -->
+                    <path d="M 140 80 L 160 80" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                    <!-- Step 2 -->
+                    <rect x="170" y="20" width="120" height="120" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                    <text x="230" y="55" fill="#f8fafc" font-size="13" font-weight="bold" text-anchor="middle">データを持っている</text>
+                    <text x="230" y="85" fill="#94a3b8" font-size="11" text-anchor="middle">名前, HP,</text>
+                    <text x="230" y="105" fill="#94a3b8" font-size="11" text-anchor="middle">攻撃力, 座標...</text>
+
+                    <!-- Arrow 2 -->
+                    <path d="M 300 80 L 320 80" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                    <!-- Step 3 -->
+                    <rect x="330" y="20" width="120" height="120" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                    <text x="390" y="55" fill="#f8fafc" font-size="13" font-weight="bold" text-anchor="middle">データを使った処理</text>
+                    <text x="390" y="85" fill="#94a3b8" font-size="11" text-anchor="middle">攻撃する, 移動する,</text>
+                    <text x="390" y="105" fill="#94a3b8" font-size="11" text-anchor="middle">ダメージを受ける...</text>
+
+                    <!-- Arrow 3 -->
+                    <path d="M 460 80 L 480 80" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                    <!-- Step 4 -->
+                    <rect x="490" y="20" width="100" height="120" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2"/>
+                    <text x="540" y="65" fill="#60a5fa" font-size="14" font-weight="bold" text-anchor="middle">クラス化</text>
+                    <text x="540" y="95" fill="#e2e8f0" font-size="12" text-anchor="middle">class化</text>
+
+                    <defs>
+                        <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa"/>
+                        </marker>
+                    </defs>
+                </svg>
+
+                <p class="text-slate-300 mb-4">
+                    ゲームの中に存在する<strong>「状態（データ）を持ち、それに応じた動作（処理）を行うもの」</strong>は、クラスとして表現するのに完璧な対象です。
+                </p>
+
+
+
+            </section>
+
+            <!-- 3.2 Characterクラスを作る -->
+            <section id="sec3-2" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">3.2 Characterクラスを作る</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    先ほど比較した通り、<code>Player</code> と <code>Enemy</code> には全く同じ属性（<code>name</code>, <code>hp</code>, <code>attack_power</code>）と全く同じメソッド（<code>attack()</code>）が含まれています。
+                </p>
+                <p class="text-slate-300 mb-4">
+                    プログラミングの大原則は <strong>DRY原則（Don't Repeat Yourself：同じコードを繰り返さない）</strong> です。「ほとんど同じコードを2回書いている」のは設計上の大きな問題であり、変更やバグの修正が2倍大変になってしまいます。
+                </p>
+
+                <!-- 3.2.1 Character -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.2.1 Character</h3>
+                <p class="text-slate-300 mb-4">
+                    そこで、両者に共通する仕組みをまとめた親となるクラス <code>Character</code> を作成します。
+                </p>
+
+                <!-- SVG 2: Character structure & Inheritance -->
+                <svg viewBox="0 0 500 220" class="w-full max-w-md mx-auto my-6">
+                    <!-- Character Parent Box -->
+                    <rect x="145" y="10" width="180" height="90" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2"/>
+                    <text x="230" y="32" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Character</text>
+                    <text x="235" y="52" fill="#94a3b8" font-size="11" text-anchor="middle">name, hp, attack_power</text>
+                    <text x="235" y="72" fill="#60a5fa" font-size="11" text-anchor="middle">attack()</text>
+
+                    <!-- Arrows -->
+                    <path d="M 230 100 L 130 140" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    <path d="M 230 100 L 330 140" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                    <!-- Player Box -->
+                    <rect x="50" y="150" width="150" height="60" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                    <text x="125" y="165" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Player</text>
+                    <text x="125" y="185" fill="#94a3b8" font-size="11" text-anchor="middle">(Characterを継承)</text>
+
+                    <!-- Enemy Box -->
+                    <rect x="310" y="150" width="150" height="60" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                    <text x="385" y="165" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Enemy</text>
+                    <text x="385" y="185" fill="#94a3b8" font-size="11" text-anchor="middle">(Characterを継承)</text>
+                </svg>
+
+                <!-- 3.2.2 継承 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.2.2 継承</h3>
+                <p class="text-slate-300 mb-4">
+                    ここで登場するのが<strong>「継承（Inheritance）」</strong>です。<br>
+                    Pythonでは、クラス名の後ろに <code>class 子クラス名(親クラス名):</code> と書くことで、親クラスの機能（属性・メソッド）をすべて引き継ぐことができます。
+                </p>
+
+                <p class="text-slate-300 mb-4">
+                    まずは <code>pass</code>（「何も追加処理をしない」を意味するキーワード）を使って、本当に機能が受け継がれるか確認してみましょう。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python"># 親クラス（スーパークラス）
+class Character:
+    def __init__(self, name, hp, attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    def attack(self):
+        print(self.name, "の攻撃！")
+
+# 子クラス（サブクラス）: Characterの機能を持つ
+class Player(Character):
+    pass
+
+class Enemy(Character):
+    pass
+
+# 実証してみよう
+Alice = Player("Alice", 100, 20)
+Slime = Enemy("Slime", 50, 10)
+
+Alice.attack()  # 出力: Alice の攻撃！
+Slime.attack()  # 出力: Slime の攻撃！
+</code></pre>
+                </div>
+
+                <p class="text-slate-300 mb-4">
+                    <code>Player</code> や <code>Enemy</code> の中身は <code>pass</code> だけなのに、<code>Character</code> で定義した <code>__init__</code> や <code>attack()</code> が問題なく動作しました！
+                </p>
+
+                <!-- 3.2.3 共通する属性 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.2.3 共通する属性</h3>
+                <p class="text-slate-300 mb-4">
+                    継承の真価は、<strong>「共通の属性・メソッドは親クラスに任せ、子クラスには固有の機能だけを書く」</strong>という役割分担にあります。
+                </p>
+
+                <!-- SVG 3: 共通属性と固有機能 -->
+                <svg viewBox="0 0 500 240" class="w-full max-w-md mx-auto my-6">
+                    <!-- Parent -->
+                    <rect x="150" y="10" width="200" height="80" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2"/>
+                    <text x="250" y="30" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Character (共通)</text>
+                    <text x="165" y="50" fill="#94a3b8" font-size="11">name, hp, attack_power</text>
+                    <text x="165" y="70" fill="#60a5fa" font-size="11">attack()</text>
+
+                    <!-- Player -->
+                    <rect x="30" y="130" width="190" height="80" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="125" y="150" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Player (固有)</text>
+                    <text x="45" y="180" fill="#10b981" font-size="12">move() [固有メソッド]</text>
+
+                    <!-- Enemy -->
+                    <rect x="280" y="130" width="190" height="80" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="375" y="150" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Enemy (固有)</text>
+                    <text x="295" y="180" fill="#f59e0b" font-size="12">chase_player() [固有メソッド]</text>
+
+                    <path d="M 200 90 L 140 130" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    <path d="M 300 90 L 360 130" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                </svg>
+<!-- 継承を使った実装例 -->
+<h4 class="text-lg font-bold text-slate-200 mt-8 mb-4">
+    継承を使って実装する
+</h4>
+
+<p class="text-slate-300 mb-4">
+    先ほどの図を実際のコードにすると、次のようになります。
+    <code>Character</code> に共通する属性やメソッドをまとめ、
+    <code>Player</code> と <code>Enemy</code> には、それぞれ固有の処理だけを追加します。
+</p>
+
+<div class="code-container mb-6 w-full">
+    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">
+        Python
+    </div>
+
+    <button
+        onclick="copyCode(this)"
+        class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">
+        Copy
+    </button>
+
+    <pre class="rounded-t-none"><code class="language-python"># 親クラス
+class Character:
+    def __init__(self, name, hp, attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    # Characterに共通するメソッド
+    def attack(self):
+        print(self.name, "の攻撃！")
+
+
+# PlayerはCharacterを継承する
+class Player(Character):
+    def move(self):
+        print(self.name, "が移動した！")
+
+
+# EnemyもCharacterを継承する
+class Enemy(Character):
+    def chase_player(self):
+        print(self.name, "がプレイヤーを追いかける！")
+
+
+# Player
+Alice = Player("Alice", 100, 20)
+
+# Characterから受け継いだ属性・メソッド
+print(Alice.hp)
+Alice.attack()
+
+# Player独自のメソッド
+Alice.move()
+
+
+# Enemy
+Slime = Enemy("Slime", 50, 10)
+
+# Characterから受け継いだ属性・メソッド
+print(Slime.hp)
+Slime.attack()
+
+# Enemy独自のメソッド
+Slime.chase_player()</code></pre>
+</div>
+
+<div class="bg-blue-950/50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-md">
+    <p class="font-bold text-blue-300 mb-2 text-sm">POINT</p>
+    <ul class="list-disc ml-5 text-sm text-slate-300 space-y-1">
+        <li><code>name</code>、<code>hp</code>、<code>attack_power</code> は <code>Character</code> にまとめる。</li>
+        <li><code>attack()</code> も <code>Character</code> にまとめる。</li>
+        <li><code>Player</code> は <code>move()</code> だけを追加する。</li>
+        <li><code>Enemy</code> は <code>chase_player()</code> だけを追加する。</li>
+    </ul>
+</div>
+
+<p class="text-slate-300 mb-4">
+    このように、<strong>共通する部分を親クラスにまとめ、異なる部分だけを子クラスに追加する</strong>
+    ことで、同じコードを何度も書かずに済みます。
+</p>
+                <!-- 3.2.4 共通するメソッド -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.2.4 共通するメソッド</h3>
+                <p class="text-slate-300 mb-4">
+                    <code>attack()</code> のような共通動作を <code>Character</code> に配置しておくことで、「プレイヤーも敵も、キャラクターの一種として同じように攻撃できる」という一貫性が生まれます。
+                </p>
+
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 3.2
+                    </p>
+                    <p class="text-slate-300">
+                        <code>Player</code> クラスにだけ <code>def move(self): print(self.name, "は移動した。")</code> を追加してみましょう。<code>Alice.move()</code> は呼び出せるが、<code>Slime.move()</code> を呼ぶとエラーになることを手元で確かめてみましょう。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 3.3 オブジェクトを管理する -->
+            <section id="sec3-3" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">3.3 オブジェクトを管理する</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    単体のクラスが作れるようになったら、次は「大量のオブジェクトをどう管理するか」というステップに進みます。
+                </p>
+
+                <!-- 3.3.1 リストとクラス -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.3.1 リストとクラス</h3>
+                <p class="text-slate-300 mb-4">
+                    ゲームに敵が10匹、100匹と登場するとき、変数を1つずつ手動で作るのは不可能です。
+                </p>
+
+                <div class="code-container mb-4 w-full">
+                    <pre><code class="language-python"># これは管理が大変...
+enemy1 = Enemy("Slime", 30, 5)
+enemy2 = Enemy("Goblin", 50, 10)
+enemy3 = Enemy("Dragon", 200, 30)</code></pre>
+                </div>
+
+                <p class="text-slate-300 mb-4">
+                    Pythonのリストには、数値や文字列だけでなく<strong>「オブジェクトそのもの」を格納することができます。</strong>
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">enemies = [
+    Enemy("Slime", 30, 5),
+    Enemy("Goblin", 50, 10),
+    Enemy("Dragon", 200, 30)
+]
+</code></pre>
+                </div>
+
+                <!-- 3.3.2 複数のEnemy -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.3.2 複数のEnemy</h3>
+                <p class="text-slate-300 mb-4">
+                    <code>enemies</code> リストの中に複数の <code>Enemy</code> オブジェクトが格納されているイメージは以下の通りです。
+                </p>
+
+                <!-- SVG 4: enemies リストと複数オブジェクト -->
+                <svg viewBox="0 0 500 150" class="w-full max-w-md mx-auto my-6">
+                    <!-- List Container -->
+                    <rect x="20" y="20" width="460" height="110" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="40" y="45" fill="#60a5fa" font-size="14" font-weight="bold">enemies (リスト)</text>
+
+                    <!-- Element 0 -->
+                    <rect x="40" y="55" width="130" height="60" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                    <text x="50" y="78" fill="#f8fafc" font-size="11" font-weight="bold">[0] Enemy</text>
+                    <text x="50" y="98" fill="#94a3b8" font-size="10">"Slime", HP:30</text>
+
+                    <!-- Element 1 -->
+                    <rect x="185" y="55" width="130" height="60" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                    <text x="195" y="78" fill="#f8fafc" font-size="11" font-weight="bold">[1] Enemy</text>
+                    <text x="195" y="98" fill="#94a3b8" font-size="10">"Goblin", HP:50</text>
+
+                    <!-- Element 2 -->
+                    <rect x="330" y="55" width="130" height="60" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+                    <text x="340" y="78" fill="#f8fafc" font-size="11" font-weight="bold">[2] Enemy</text>
+                    <text x="340" y="98" fill="#94a3b8" font-size="10">"Dragon", HP:200</text>
+                </svg>
+
+                <!-- 3.3.3 forでまとめて処理 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.3.3 forでまとめて処理</h3>
+                <p class="text-slate-300 mb-4">
+                    「リスト ＋ <code>for</code> ループ ＋ クラス」を組み合わせることで、どれほど大量のオブジェクトが存在していても、わずか数行でまとめて処理を行えます。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python"># 全員の名前を表示
+for enemy in enemies:
+    print(enemy.name)
+
+# 全員に一斉に攻撃行動を行わせる
+for enemy in enemies:
+    enemy.attack()
+</code></pre>
+                </div>
+
+                <!-- 3.3.4 オブジェクトの追加・削除 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.3.4 オブジェクトの追加・削除</h3>
+                <p class="text-slate-300 mb-4">
+                    ゲームの進行に伴って新しい敵が出現した場合は <code>append()</code>、倒されて消滅した場合は <code>remove()</code> などを使ってリストから外します。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python"># 新しい敵「Bat」が途中出現
+enemies.append(Enemy("Bat", 20, 3))
+
+# 先頭の敵（Slime）が倒れたのでリストから除外
+defeated_enemy = enemies[0]
+enemies.remove(defeated_enemy)
+# または del enemies[0]
+</code></pre>
+                </div>
+
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 3.3
+                    </p>
+                    <p class="text-slate-300">
+                        <code>enemies</code> リストを作成し、<code>for</code> ループの中で各敵のHPを <code>print(enemy.name, "HP:", enemy.hp)</code> のように表示するプログラムを実行してみてください。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 3.4 メソッド同士を連携させる -->
+            <section id="sec3-4" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">3.4 メソッド同士を連携させる</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    これまでは「1つのオブジェクトが単体で動作する」例だけを見てきましたが、実際のゲームでは<strong>「オブジェクト同士が影響し合う」</strong>処理が不可欠です。
+                </p>
+
+                <!-- 3.4.1 PlayerからEnemyを操作 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.4.1 PlayerからEnemyを操作</h3>
+                <p class="text-slate-300 mb-4">
+                    例えば、「AliceがSlimeを攻撃する」という処理は、<code>Alice.attack(Slime)</code> のように<strong>攻撃対象のオブジェクトを引数として渡す</strong>ことで実現します。
+                </p>
+
+                <!-- SVG 5: Alice attack Slime -->
+                <svg viewBox="0 0 450 120" class="w-full max-w-md mx-auto my-6">
+                    <rect x="30" y="35" width="120" height="50" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="90" y="65" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Alice (Player)</text>
+
+                    <path d="M 160 60 L 280 60" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    <text x="220" y="50" fill="#60a5fa" font-size="12" font-weight="bold" text-anchor="middle">attack(Slime)</text>
+
+                    <rect x="290" y="35" width="120" height="50" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="350" y="65" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Slime (Enemy)</text>
+                </svg>
+
+                <!-- 3.4.2 攻撃 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.4.2 攻撃</h3>
+                <p class="text-slate-300 mb-4">
+                    <code>Character</code> クラスの <code>attack</code> メソッドを拡張し、受け取った対象（<code>target</code>）のHPを自身の攻撃力分減らすように書き換えます。
+                </p>
+
+                <div class="code-container mb-4 w-full">
+                    <pre><code class="language-python">    def attack(self, target):
+        target.hp -= self.attack_power</code></pre>
+                </div>
+                <p class="text-slate-300 mb-4">
+                    ここで引数 <code>target</code> は、攻撃対象となる「他のCharacterオブジェクト」を指します。
+                </p>
+
+                <!-- 3.4.3 ダメージ -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.4.3 ダメージ</h3>
+                <p class="text-slate-300 mb-4">
+                    実際にメッセージ表示を含めた完全なプログラムを実行してみましょう。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Character:
+    def __init__(self, name, hp, attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    def attack(self, target):
+        target.hp -= self.attack_power
+        print(f"{self.name}が{target.name}に{self.attack_power}のダメージ！")
+
+class Player(Character):
+    pass
+
+class Enemy(Character):
+    pass
+
+Alice = Player("Alice", 100, 20)
+Slime = Enemy("Slime", 30, 5)
+
+print("攻撃前のSlime HP:", Slime.hp)  # 30
+Alice.attack(Slime)
+print("攻撃後のSlime HP:", Slime.hp)  # 10
+</code></pre>
+                </div>
+
+                <!-- 3.4.4 オブジェクト同士の関係 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.4.4 オブジェクト同士の関係</h3>
+                <p class="text-slate-300 mb-4">
+                    オブジェクト指向設計では、「単一のオブジェクトをどう作るか」だけでなく、このように<strong>「オブジェクト同士がメッセージ（メソッド呼び出し）を通じてお互いの状態を変化させる」</strong>という視点が非常に重要になります。
+                </p>
+
+                <!-- SVG 6: オブジェクト間の作用フロー -->
+                <svg viewBox="0 0 500 130" class="w-full max-w-md mx-auto my-6">
+                    <rect x="20" y="30" width="100" height="70" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="70" y="60" fill="#f8fafc" font-size="13" font-weight="bold" text-anchor="middle">Player</text>
+                    <text x="70" y="80" fill="#94a3b8" font-size="10" text-anchor="middle">(Alice)</text>
+
+                    <path d="M 130 65 L 210 65" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    <text x="170" y="55" fill="#60a5fa" font-size="11" font-weight="bold" text-anchor="middle">attack()呼び出し</text>
+
+                    <rect x="220" y="30" width="110" height="70" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="275" y="60" fill="#f8fafc" font-size="13" font-weight="bold" text-anchor="middle">Enemy</text>
+                    <text x="275" y="80" fill="#94a3b8" font-size="10" text-anchor="middle">(Slime)</text>
+
+                    <path d="M 340 65 L 380 65" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrow-red)"/>
+
+                    <rect x="390" y="30" width="90" height="70" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                    <text x="435" y="60" fill="#fca5a5" font-size="12" font-weight="bold" text-anchor="middle">HP減少</text>
+                    <text x="435" y="80" fill="#fca5a5" font-size="10" text-anchor="middle">30 ➔ 10</text>
+
+                    <defs>
+                        <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+                        </marker>
+                    </defs>
+                </svg>
+
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 3.4
+                    </p>
+                    <p class="text-slate-300">
+                        逆に <code>Slime.attack(Alice)</code> を呼び出して、<code>Alice</code> のHPが減少することを確認するコードを追加・実行してみましょう。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 3.5 オブジェクトの状態を管理する -->
+            <section id="sec3-5" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">3.5 オブジェクトの状態を管理する</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    オブジェクトは内部に「状態（State）」を持っています。ゲームプログラムでは、オブジェクトの現在の状態に応じて処理を分岐させることが一般的です。
+                </p>
+
+                <!-- 3.5.1 HP & 3.5.2 生存・死亡 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.5.1 HP / 3.5.2 生存・死亡</h3>
+                <p class="text-slate-300 mb-4">
+                    キャラクターの最も基本的な状態は「生存」と「死亡」です。これは <code>hp</code> の値によって移り変わります。
+                </p>
+
+                <!-- SVG 7: 状態遷移図 -->
+                <svg viewBox="0 0 450 130" class="w-full max-w-md mx-auto my-6">
+                    <!-- State 1: Living -->
+                    <rect x="40" y="35" width="130" height="60" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="105" y="60" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle">生存 (Alive)</text>
+                    <text x="105" y="80" fill="#94a3b8" font-size="11" text-anchor="middle">HP &gt; 0</text>
+
+                    <!-- Transition Arrow -->
+                    <path d="M 180 65 L 260 65" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrow-red)"/>
+                    <text x="220" y="55" fill="#fca5a5" font-size="11" text-anchor="middle">ダメージを受ける</text>
+
+                    <!-- State 2: Dead -->
+                    <rect x="270" y="35" width="130" height="60" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                    <text x="335" y="60" fill="#ef4444" font-size="14" font-weight="bold" text-anchor="middle">死亡 (Dead)</text>
+                    <text x="335" y="80" fill="#94a3b8" font-size="11" text-anchor="middle">HP &lt;= 0</text>
+                </svg>
+
+                <!-- 3.5.3 is_alive() -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.5.3 is_alive()</h3>
+                <p class="text-slate-300 mb-4">
+                    <code>if enemy.hp > 0:</code> と直接判定を書くこともできますが、生存条件の判定を <code>is_alive()</code> というメソッドとしてカプセル化（定義）しておくと、設計上非常に大きなメリットがあります。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Character:
+    def __init__(self, name, hp, attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    # 生存判定を行うメソッド
+    def is_alive(self):
+        return self.hp > 0
+</code></pre>
+                </div>
+
+                <div class="bg-slate-800/80 border-l-4 border-blue-400 p-4 mb-6">
+                    <p class="text-sm text-slate-300">
+                        💡 <strong>設計上のポイント（カプセル化）</strong><br>
+                        もし将来「毒状態ならHP1でも死亡扱い」「食いしばりスキルがあればHP0でも1回生存」のように生存条件の仕様が変わっても、<code>is_alive()</code> の中身だけを修正すればよく、呼び出し側のコードを変更する必要がなくなります。
+                    </p>
+                </div>
+
+                <!-- 3.5.4 状態に応じた処理 -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.5.4 状態に応じた処理</h3>
+                <p class="text-slate-300 mb-4">
+                    リスト管理と組み合わせることで、「生きている敵だけが攻撃してくる」という実践的なゲームループが構築できます。
+                </p>
+
+                <!-- SVG 8: 状態に応じた分岐処理 -->
+                <svg viewBox="0 0 500 160" class="w-full max-w-md mx-auto my-6">
+                    <rect x="20" y="55" width="100" height="50" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                    <text x="70" y="85" fill="#f8fafc" font-size="13" font-weight="bold" text-anchor="middle">Enemy</text>
+
+                    <path d="M 130 80 L 190 80" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                    <rect x="200" y="55" width="110" height="50" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2"/>
+                    <text x="255" y="85" fill="#60a5fa" font-size="12" font-weight="bold" text-anchor="middle">is_alive() ?</text>
+
+                    <!-- True branch -->
+                    <path d="M 310 65 L 370 40" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)"/>
+                    <text x="335" y="45" fill="#10b981" font-size="10" font-weight="bold">True</text>
+                    <rect x="380" y="15" width="100" height="40" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="430" y="40" fill="#10b981" font-size="12" font-weight="bold" text-anchor="middle">攻撃する</text>
+
+                    <!-- False branch -->
+                    <path d="M 310 95 L 370 120" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrow-gray)"/>
+                    <text x="335" y="120" fill="#64748b" font-size="10" font-weight="bold">False</text>
+                    <rect x="380" y="105" width="100" height="40" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+                    <text x="430" y="130" fill="#64748b" font-size="12" text-anchor="middle">無視 (処理しない)</text>
+
+                    <defs>
+                        <marker id="arrow-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                        </marker>
+                        <marker id="arrow-gray" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+                        </marker>
+                    </defs>
+                </svg>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python"># 生きている敵だけが行動するループ
+for enemy in enemies:
+    if enemy.is_alive():
+        enemy.attack(Alice)
+    else:
+        print(f"{enemy.name}は倒れている...")
+</code></pre>
+                </div>
+
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 3.5
+                    </p>
+                    <p class="text-slate-300">
+                        <code>Alice</code> が <code>Slime</code> に2回連続で攻撃（<code>Alice.attack(Slime)</code>）し、2回目の攻撃後に <code>Slime.is_alive()</code> が <code>False</code> に変わるか手元で実行して確認してください。
+                    </p>
+                </div>
+<!-- ここまでのコードを一つにまとめる -->
+<div class="mt-10">
+    <h3 class="text-xl font-bold text-slate-200 mb-4">
+        ここまでのコードを一つにまとめる
+    </h3>
+
+    <p class="text-slate-300 mb-4">
+        ここまで学んだ内容を、一つのプログラムにまとめてみましょう。
+        このコードでは、<code>Character</code>、継承、リストによるオブジェクト管理、
+        オブジェクト同士の攻撃、HPによる状態管理をすべて使用しています。
+    </p>
+
+    <div class="bg-blue-950/50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-md">
+        <p class="font-bold text-blue-300 mb-2 text-sm">このコードで使っていること</p>
+        <ul class="list-disc ml-5 text-sm text-slate-300 space-y-1">
+            <li><code>Character</code> に共通するデータと処理をまとめる</li>
+            <li><code>Player</code> と <code>Enemy</code> が <code>Character</code> を継承する</li>
+            <li><code>Enemy</code> オブジェクトをリストでまとめて管理する</li>
+            <li><code>attack(target)</code> でオブジェクト同士が影響を与える</li>
+            <li><code>is_alive()</code> でキャラクターの状態を判定する</li>
+        </ul>
+    </div>
+
+    <!-- 完成コード -->
+    <div class="code-container mb-8 w-full">
+        <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">
+            Python
+        </div>
+
+        <button
+            onclick="copyCode(this)"
+            class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">
+            Copy
+        </button>
+
+        <pre class="rounded-t-none"><code class="language-python"># ==============================
+# Characterクラス
+# ==============================
+
+class Character:
+    def __init__(self, name, hp, attack_power):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack_power
+
+    # 攻撃する
+    def attack(self, target):
+        target.hp -= self.attack_power
+        print(
+            f"{self.name}が{target.name}に"
+            f"{self.attack_power}のダメージ！"
+        )
+
+    # 生存しているか判定する
+    def is_alive(self):
+        return self.hp > 0
+
+
+# ==============================
+# Playerクラス
+# Characterを継承
+# ==============================
+
+class Player(Character):
+    def move(self):
+        print(f"{self.name}が移動した！")
+
+
+# ==============================
+# Enemyクラス
+# Characterを継承
+# ==============================
+
+class Enemy(Character):
+    def chase_player(self):
+        print(f"{self.name}がプレイヤーを追いかける！")
+
+
+# ==============================
+# オブジェクトを作成
+# ==============================
+
+Alice = Player("Alice", 100, 40)
+
+enemies = [
+    Enemy("Slime", 30, 5),
+    Enemy("Goblin", 50, 10),
+    Enemy("Dragon", 200, 30)
+]
+
+
+# ==============================
+# Playerの行動
+# ==============================
+
+Alice.move()
+
+
+# ==============================
+# 敵の一覧を表示
+# ==============================
+
+print("=== 敵の一覧 ===")
+
+for enemy in enemies:
+    print(
+        enemy.name,
+        "HP:", enemy.hp,
+        "攻撃力:", enemy.attack_power
+    )
+
+
+# ==============================
+# AliceがSlimeを攻撃
+# ==============================
+
+print("\n=== 戦闘開始 ===")
+
+Slime = enemies[0]
+
+Alice.attack(Slime)
+
+print("Slimeの残りHP:", Slime.hp)
+
+
+# ==============================
+# 生きている敵がAliceを攻撃
+# ==============================
+
+print("\n=== 敵のターン ===")
+
+for enemy in enemies:
+    if enemy.is_alive():
+        enemy.attack(Alice)
+    else:
+        print(f"{enemy.name}は倒れている...")
+
+
+# ==============================
+# 現在の状態を確認
+# ==============================
+
+print("\n=== 現在の状態 ===")
+
+print(f"{Alice.name}のHP:", Alice.hp)
+
+for enemy in enemies:
+    status = "生存" if enemy.is_alive() else "死亡"
+
+    print(
+        f"{enemy.name}: "
+        f"HP={enemy.hp}, {status}"
+    )</code></pre>
+    </div>
+
+    <!-- 実習 -->
+    <div class="bg-emerald-950/40 border border-emerald-700/60 rounded-md p-5 mb-8">
+        <p class="font-bold text-emerald-300 mb-3 text-sm flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                </path>
+            </svg>
+            TRY
+        </p>
+
+        <p class="text-sm text-slate-300 mb-3">
+            このコードを自分のPCで実行してみましょう。
+            実行できたら、次のような変更を加えて、動作がどのように変化するか確認してください。
+        </p>
+
+        <ul class="list-disc ml-5 text-sm text-slate-300 space-y-1">
+            <li><code>Alice</code> のHPや攻撃力を変更する</li>
+            <li>敵の数を増やす</li>
+            <li>敵のHPや攻撃力を変更する</li>
+            <li><code>Alice.attack(Slime)</code> を複数回実行する</li>
+            <li><code>Slime.attack(Alice)</code> を追加してみる</li>
+            <li>敵が倒れるまで攻撃を繰り返してみる</li>
+        </ul>
+    </div>
+
+    <p class="text-slate-300 mb-4">
+        このように、クラスを使うことで、ゲームに登場する「もの」を
+        <strong class="text-slate-100">データと処理を持ったオブジェクト</strong>
+        として表現できます。
+    </p>
+
+    <p class="text-slate-300">
+        さらに、複数のオブジェクトをリストで管理し、
+        オブジェクト同士がメソッドを通じて互いの状態を変化させることで、
+        より複雑なゲームの仕組みを組み立てられるようになります。
+    </p>
+</div>
+            </section>
+
+            <!-- 3.6 ゲームを設計してみよう -->
+            <section id="sec3-6" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">3.6 ゲームを設計してみよう</h2>
+                
+                <p class="text-slate-300 mb-6">
+                    ここまでの内容をふまえ、今度はあなた自身が「オリジナルゲームのクラス設計」に挑戦してみましょう。プログラムのコードを書く前に、設計図を描くワークショップです。
+                </p>
+
+                <!-- 3.6.1 登場する「もの」を考える -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.6.1 登場する「もの」を考える</h3>
+                <p class="text-slate-300 mb-4">
+                    自分が作りたいゲームジャンル（例：2Dシューティング、コマンドRPG、アクション等）を1つ思い浮かべ、そこにどんな「もの」が登場するか書き出してみましょう。
+                </p>
+                <div class="bg-slate-800/60 p-4 rounded-md mb-6 border border-slate-700">
+                    <ul class="list-disc ml-5 text-sm text-slate-300 space-y-2">
+                        <li><strong>シューティングゲームの例：</strong> <code>Player</code>, <code>Enemy</code>, <code>Bullet</code>（自機弾/敵弾）, <code>Item</code></li>
+                        <li><strong>RPGの例：</strong> <code>Player</code>, <code>Enemy</code>, <code>Weapon</code>, <code>Item</code>, <code>Party</code></li>
+                    </ul>
+                </div>
+
+                <!-- 3.6.2 属性を考える -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.6.2 属性を考える</h3>
+                <p class="text-slate-300 mb-4">
+                    抽出した「もの」が、それぞれどのような<strong>データ（属性）</strong>を持つべきか整理します。
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-800 p-4 rounded border border-slate-700">
+                        <p class="font-bold text-blue-400 text-sm mb-2">Player の属性（例）</p>
+                        <p class="text-xs text-slate-300 font-mono">├── name (名前)<br>├── hp (体力)<br>├── x, y (画面上の位置座標)<br>└── attack_power (攻撃力)</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded border border-slate-700">
+                        <p class="font-bold text-blue-400 text-sm mb-2">Bullet (弾) の属性（例）</p>
+                        <p class="text-xs text-slate-300 font-mono">├── x, y (現在位置)<br>├── speed_x, speed_y (移動速度)<br>└── power (威力)</p>
+                    </div>
+                </div>
+
+                <!-- 3.6.3 メソッドを考える -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.6.3 メソッドを考える</h3>
+                <p class="text-slate-300 mb-4">
+                    次に、各オブジェクトが行える<strong>処理（メソッド）</strong>を考えます。
+                </p>
+                <div class="bg-slate-800/60 p-4 rounded-md mb-6 border border-slate-700">
+                    <div class="text-sm text-slate-300 space-y-2">
+                        <p>・<strong>属性</strong> ＝ そのものが持っているデータ（名詞的）</p>
+                        <p>・<strong>メソッド</strong> ＝ そのものができる処理（動詞的）</p>
+                    </div>
+                </div>
+
+                <!-- 3.6.4 クラス構成を作る -->
+                <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">3.6.4 クラス構成を作る</h3>
+                <p class="text-slate-300 mb-4">
+                    最後に、共通部分から親クラス（例：<code>Character</code>）を抜き出し、各クラスがどう連携するか全体図を作ります。以下はゲーム全体のクラス構成図の代表的な例です。
+                </p>
+
+                <!-- SVG 9: 全体クラス構成図 -->
+                <svg viewBox="0 0 550 260" class="w-full max-w-lg mx-auto my-6">
+                    <!-- Character (Parent) -->
+                    <rect x="200" y="10" width="150" height="60" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2"/>
+                    <text x="275" y="35" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Character</text>
+                    <text x="275" y="55" fill="#94a3b8" font-size="10" text-anchor="middle">name, hp, attack()</text>
+
+                    <!-- Player -->
+                    <rect x="80" y="110" width="140" height="60" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="150" y="135" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Player</text>
+                    <text x="150" y="155" fill="#10b981" font-size="10" text-anchor="middle">shoot() / heal()</text>
+
+                    <!-- Enemy -->
+                    <rect x="330" y="110" width="140" height="60" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="400" y="135" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Enemy</text>
+                    <text x="400" y="155" fill="#f59e0b" font-size="10" text-anchor="middle">drop_item()</text>
+
+                    <!-- Bullet -->
+                    <rect x="80" y="210" width="140" height="40" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1.5"/>
+                    <text x="150" y="235" fill="#a855f7" font-size="12" font-weight="bold" text-anchor="middle">Bullet (弾)</text>
+
+                    <!-- Inheritance Arrows -->
+                    <path d="M 220 70 L 170 110" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    <path d="M 330 70 L 380 110" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                    <!-- Action Arrows -->
+                    <path d="M 220 140 L 330 140" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrow-red)"/>
+                    <text x="275" y="132" fill="#fca5a5" font-size="10" font-weight="bold" text-anchor="middle">attack()</text>
+
+                    <path d="M 150 170 L 150 210" stroke="#a855f7" stroke-width="2" fill="none" marker-end="url(#arrow-purple)"/>
+                    <text x="150" y="195" fill="#c084fc" font-size="10" font-weight="bold" text-anchor="middle">shoot()生成</text>
+
+                    <defs>
+                        <marker id="arrow-purple" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#a855f7"/>
+                        </marker>
+                    </defs>
+                </svg>
+
+
+
+                <p class="text-slate-300 leading-relaxed">
+                    プログラムを書く前にこのように「登場するものをクラスとして整理する」ことこそが、大規模なゲーム制作でも破綻しないコードを書くための最大の秘訣です。
+                </p>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="text-center py-10 mt-10 border-t border-slate-800 bg-slate-900">
+        <div class="text-sm font-bold text-slate-500">
+            IQ Python Workshop 2026 - Rep. Takiguchi
+        </div>
+    </footer>
+
+    <script>
+        // Syntax Highlighting の初期化
+        hljs.highlightAll();
+
+        // コードブロックのワンタップコピー機能
+        function copyCode(element) {
+            const container = element.closest('.code-container');
+            if (!container) return;
+            
+            const code = container.querySelector('code').innerText;
+            const btn = container.querySelector('.copy-btn');
+            
+            if (window.getSelection().toString().length > 0 && element.tagName !== 'BUTTON') {
+                return;
+            }
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn ? btn.innerText : '';
+
+                if (btn) {
+                    btn.innerText = 'Copied!';
+                    btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                    btn.classList.add('bg-emerald-500');
+                }
+
+                setTimeout(() => {
+                    if (btn) {
+                        btn.innerText = originalText;
+                        btn.classList.remove('bg-emerald-500');
+                        btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                    }
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed: ', err);
+            });
+        }
+
+        // スクロールに応じた目次のアクティブハイライト機能
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.toc-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                            link.classList.add('text-slate-400', 'border-transparent');
+                            
+                            if (link.getAttribute('href').slice(1) === entry.target.id) {
+                                link.classList.add('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                                link.classList.remove('text-slate-400', 'border-transparent');
+                            }
+                        });
+                    }
+                });
+            }, { 
+                rootMargin: '-20% 0px -70% 0px' 
+            });
+
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>第4章 Pyxel入門 | Pyxel Game Programming</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #cbd5e1; /* slate-300 */
+            scroll-behavior: smooth;
+        }
+
+        /* コードブロックのカスタマイズ */
+        pre {
+            margin: 0 !important;
+            padding: 1.25rem !important;
+            border-radius: 0.5rem;
+            background: #020617 !important; /* slate-950 */
+            font-size: 0.9rem;
+            overflow-x: auto;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #1e293b;
+            transition: border-color 0.2s ease;
+        }
+        
+        pre:hover {
+            border-color: #60a5fa; /* hover時に青い枠線 */
+        }
+
+        code.hljs {
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+        
+        .code-container {
+            position: relative;
+            height: 100%;
+        }
+
+        @media (hover: hover) {
+            pre:hover::after {
+                content: 'Tap to Copy';
+                position: absolute;
+                bottom: 10px;
+                right: 15px;
+                font-size: 0.75rem;
+                color: #64748b;
+                pointer-events: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-10">
+    
+    <!-- 左側：目次（サイドバー） -->
+    <aside class="md:w-64 flex-shrink-0 hidden md:block">
+        <nav id="toc" class="sticky top-10 flex flex-col space-y-1 border-l-2 border-slate-800 pl-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">4. Pyxel入門</p>
+            <a href="#sec4-0" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">4.0 Pyxel</a>
+            <a href="#sec4-1" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">4.1 最初のPyxelプログラム</a>
+            <a href="#sec4-2" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">4.2 ゲームループ</a>
+            <a href="#sec4-3" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">4.3 座標と描画</a>
+            <a href="#sec4-4" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">4.4 キーボード入力</a>
+            <a href="#sec4-5" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">4.5 小さなプログラムを作る</a>
+            <a href="#sec-summary" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">この章で学んだこと</a>
+        </nav>
+    </aside>
+
+    <!-- 右側：メインコンテンツ -->
+    <main class="flex-1 space-y-16">
+        
+        <header class="border-b border-slate-800 pb-8">
+
+
+            <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-100">4.  Pyxel入門</h1>
+            <p class="text-lg text-slate-400 mt-2">ゲームエンジンの基本構造を理解する</p>
+            <p class="text-slate-300 mt-6 leading-relaxed">
+                この章では、Pyxelを使って実際にコードを書きながら、ゲームプログラムの基本構造を学びます。高度な機能を使うことよりも、<strong>「ゲームエンジンの中でプログラムがどのように動いているのか」</strong>を理解することが最大の目標です。
+            </p>
+        </header>
+
+
+
+        <!-- スマホ用ナビゲーション -->
+        <nav class="md:hidden bg-slate-800 p-4 rounded-md mb-8">
+            <p class="text-xs font-bold text-slate-400 uppercase mb-2">章ナビゲーション</p>
+            <ul class="space-y-2 text-sm text-blue-400">
+                <li><a href="#sec4-0" class="hover:underline">4.0 Pyxel</a></li>
+                <li><a href="#sec4-1" class="hover:underline">4.1 コーディング</a></li>
+                <li><a href="#sec4-2" class="hover:underline">4.2 ゲームループ</a></li>
+                <li><a href="#sec4-3" class="hover:underline">4.3 座標と描画</a></li>
+                <li><a href="#sec4-4" class="hover:underline">4.4 キーボード入力</a></li>
+                <li><a href="#sec4-5" class="hover:underline">4.5 小さなプログラムを作る</a></li>
+            </ul>
+        </nav>
+
+        <!-- 4.0 Pyxel -->
+        <section id="sec4-0" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">4.0 Pyxel</h2>
+            
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">Pyxelとは</h3>
+            <p class="text-slate-300 mb-4">
+                <strong>Pyxel（ピクセル）</strong>は、Pythonでゲームを作るためのライブラリです。特に、ドット絵を使ったレトロゲーム風の2Dゲームを簡単に作れるように設計されています。
+            </p>
+
+            <div class="bg-slate-800/80 border-l-4 border-blue-400 p-4 my-4">
+                <p class="font-bold text-blue-300 text-sm">【ゲームエンジン】</p>
+                <p class="text-sm text-slate-300">ゲームを作る際に必要になる、グラフィックの描画、キーボード入力の受け取り、音声の再生、ゲーム全体の進行管理（ゲームループ）などの機能をまとめて提供する仕組みのことです。</p>
+            </div>
+
+            <p class="text-slate-300 mb-4">
+                Pyxelも立派なゲームエンジンの一つです。機能が非常にシンプルにまとまっているため、<strong>学習教材として扱いやすく、ゲームプログラムの基本構造を理解するのに最適</strong>です。
+            </p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">他のゲームエンジンとの比較</h3>
+            <p class="text-slate-300 mb-4">
+                世の中には様々なゲームエンジンが存在します。今回の教材ではなぜPyxelを使うのか、表と図で比較してみましょう。
+            </p>
+
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full text-left text-sm text-slate-300 border-collapse bg-slate-900 border border-slate-800">
+                    <thead class="bg-slate-800 text-slate-100">
+                        <tr>
+                            <th class="p-3 border-b border-slate-700 whitespace-nowrap">エンジン</th>
+                            <th class="p-3 border-b border-slate-700 whitespace-nowrap">主な言語</th>
+                            <th class="p-3 border-b border-slate-700 whitespace-nowrap">2D/3D</th>
+                            <th class="p-3 border-b border-slate-700 whitespace-nowrap">学習コスト</th>
+                            <th class="p-3 border-b border-slate-700 whitespace-nowrap">今回の教材との相性</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-800 bg-slate-800/30">
+                            <td class="p-3 font-bold text-blue-400">Pyxel</td>
+                            <td class="p-3">Python</td>
+                            <td class="p-3">2D</td>
+                            <td class="p-3">非常に低い</td>
+                            <td class="p-3">◎ (基本構造を学ぶのに最適)</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="p-3 text-slate-100">Unity</td>
+                            <td class="p-3">C#</td>
+                            <td class="p-3">2D/3D</td>
+                            <td class="p-3">高い</td>
+                            <td class="p-3">△ (多機能すぎて初学者は迷子になりがち)</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="p-3 text-slate-100">Godot</td>
+                            <td class="p-3">GDScript / C#</td>
+                            <td class="p-3">2D/3D</td>
+                            <td class="p-3">中程度</td>
+                            <td class="p-3">〇 (本格的なゲーム制作向け)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 text-slate-100">Unreal Engine</td>
+                            <td class="p-3">C++ / Blueprint</td>
+                            <td class="p-3">3D中心</td>
+                            <td class="p-3">非常に高い</td>
+                            <td class="p-3">△ (高度なグラフィック向け)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SVG 1: ゲームエンジンの位置づけ -->
+            <svg viewBox="0 0 500 250" class="w-full max-w-lg mx-auto my-6">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+                    </marker>
+                </defs>
+                <rect width="500" height="250" fill="#0f172a" />
+                <!-- 軸 -->
+                <line x1="50" y1="200" x2="450" y2="200" stroke="#334155" stroke-width="2" marker-end="url(#arrow)" />
+                <line x1="50" y1="200" x2="50" y2="20" stroke="#334155" stroke-width="2" marker-end="url(#arrow)" />
+                <text x="450" y="225" fill="#94a3b8" font-size="14" text-anchor="end">学習しやすさ (シンプルさ)</text>
+                <text x="25" y="40" fill="#94a3b8" font-size="14" transform="rotate(-90 25,40)">高機能・複雑</text>
+                
+                <!-- Unreal / Unity -->
+                <rect x="70" y="40" width="160" height="30" rx="4" fill="#1e293b" stroke="#334155"/>
+                <text x="150" y="60" fill="#cbd5e1" font-size="12" text-anchor="middle">Unreal Engine / Unity</text>
+                
+                <!-- Godot -->
+                <rect x="130" y="100" width="100" height="30" rx="4" fill="#1e293b" stroke="#334155"/>
+                <text x="180" y="120" fill="#cbd5e1" font-size="12" text-anchor="middle">Godot</text>
+                
+                <!-- Pyxel -->
+                <rect x="300" y="150" width="100" height="40" rx="4" fill="#3b82f6" opacity="0.2" stroke="#3b82f6"/>
+                <text x="350" y="175" fill="#60a5fa" font-size="16" font-weight="bold" text-anchor="middle">Pyxel</text>
+                <path d="M 410 170 L 460 170" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+                <text x="480" y="174" fill="#60a5fa" font-size="14" font-weight="bold" text-anchor="middle">今回</text>
+            </svg>
+
+            <p class="text-slate-300 mb-4">
+                今回は「高度な機能を使うこと」よりも、<strong>「ゲームの基本構造（裏側の仕組み）を理解すること」</strong>を優先するため、最もシンプルでコードの全体像が見えやすいPyxelを採用します。
+            </p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">インストール方法（WSL）</h3>
+            <p class="text-slate-300 mb-4">
+                WSL（Windows Subsystem for Linux）環境のターミナルを開き、以下のコマンドを実行してPyxelをインストールしてください。
+            </p>
+
+            <div class="code-container mb-6 w-full">
+                <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">Terminal</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-slate-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-slate-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-bash">pip install pyxel</code></pre>
+            </div>
+            
+            <p class="text-slate-300 mb-4">
+                もしエラーが出る場合は、<code>python3 -m pip install pyxel</code> を試してください。
+            </p>
+        </section>
+
+        <!-- 4.1 最初のPyxelプログラム -->
+        <section id="sec4-1" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">4.1 コーディング</h2>
+            
+            <p class="text-slate-300 mb-4">
+                ここからは実際にPythonのファイルを作成し、コードを書いていきましょう。<code>main.py</code> などのファイルを作成して進めてください。
+            </p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">Step 1：Pyxelを読み込む</h3>
+            <p class="text-slate-300 mb-4">
+                まず、Pyxelの機能を利用するためにモジュールを読み込みます。<br>
+                <code>import</code> はC言語でいう、#include&lt;stdio.h&gt;のようなものです。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel</code></pre>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">Step 2：画面を初期化する</h3>
+            <p class="text-slate-300 mb-4">
+                次に、ゲームの画面を作ります。<br>
+                <strong><code>pyxel.init(width, height)</code></strong> は、指定した幅と高さでゲーム画面などの初期設定を行うためのPyxelの関数です。
+            </p>
+
+            <div class="code-container mb-4 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+# 画面の幅を160、高さを120に設定して初期化
+pyxel.init(160, 120)</code></pre>
+            </div>
+
+            <!-- SVG: 画面サイズ -->
+            <svg viewBox="0 0 400 200" class="w-full max-w-md mx-auto my-6">
+                <text x="60" y="30" fill="#94a3b8" font-size="14">(0, 0)</text>
+                <rect x="70" y="40" width="260" height="140" fill="#020617" stroke="#3b82f6" stroke-width="2"/>
+                <text x="200" y="115" fill="#f1f5f9" font-size="18" font-weight="bold" text-anchor="middle">160 × 120</text>
+            </svg>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">Step 3：update()とdraw()を用意する</h3>
+            <p class="text-slate-300 mb-4">
+                Pyxelを動かすには、特別な2つの関数 <code>update</code> と <code>draw</code> が必要です。<br>
+                <span class="text-sm text-slate-400">（<code>def</code> は第1章で学んだ関数を定義する構文です。）</span>
+            </p>
+
+            <div class="code-container mb-4 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+def update():
+    pass
+
+def draw():
+    pass
+
+pyxel.init(160, 120)</code></pre>
+            </div>
+
+            <div class="bg-slate-800/80 p-4 my-4 border-l-4 border-slate-500 text-sm text-slate-300">
+                <p><strong><code>pass</code> とは？</strong><br>
+                Pythonにおいて「ここでは何もしない」という処理を書くための文です。中身が空の関数を作るとエラーになるため、一時的に置いています。</p>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">Step 4：ゲームを動かす</h3>
+            <p class="text-slate-300 mb-4">
+                最後に、<strong><code>pyxel.run()</code></strong> を使ってゲームを起動します。<br>
+                <code>pyxel.run(update, draw)</code> は、先ほど定義した2つの関数をPyxelに渡し、「この2つの処理をゲーム中にずっと繰り返し呼び出してね」とお願いする関数です。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+def update():
+    pass
+
+def draw():
+    pass
+
+pyxel.init(160, 120)
+pyxel.run(update, draw)</code></pre>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded mt-4 border border-slate-700">
+                <p class="font-bold text-slate-200 text-sm mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    実行してみよう
+                </p>
+                <p class="text-sm text-slate-300 mb-2">ターミナルで <code>python main.py</code>（またはファイル名）を実行してください。</p>
+                <p class="text-sm text-slate-400 border-t border-slate-700 pt-2"><strong>何が起こった？</strong><br>画面は開きますが、真っ暗なままで何も表示されません。<br>なぜ何も描画されないのでしょうか？ その答えと仕組みを次の 4.2 で解説します。</p>
+            </div>
+        </section>
+
+        <!-- 4.2 ゲームループ -->
+        <section id="sec4-2" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">4.2 ゲームループ</h2>
+            
+            <p class="text-slate-300 mb-4 leading-relaxed">
+                ゲームは、プログラムが上から下へ1回だけ実行されて終わるわけではありません。<br>
+                ゲームが起動している間、プログラムは<strong>「入力を受け取る → 状態を変える → 画面を描画する」という処理を猛烈なスピードで何度も何度も繰り返しています。</strong><br>
+                この繰り返しの仕組みを<strong>「ゲームループ」</strong>と呼びます。
+            </p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">ゲームループとは</h3>
+            
+            <!-- SVG: ゲームループ -->
+            <svg viewBox="0 0 600 280" class="w-full max-w-2xl mx-auto my-6">
+                <defs>
+                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+                    </marker>
+                    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+                    </marker>
+                </defs>
+
+                <!-- Frame Box -->
+                <rect x="20" y="40" width="560" height="180" rx="12" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="6" />
+                <text x="300" y="30" fill="#f1f5f9" font-size="16" font-weight="bold" text-anchor="middle">1フレーム（画面の1コマ）の処理</text>
+
+                <!-- Input -->
+                <rect x="50" y="90" width="120" height="60" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2" />
+                <text x="110" y="115" fill="#cbd5e1" font-size="14" font-weight="bold" text-anchor="middle">キーボード等の</text>
+                <text x="110" y="135" fill="#cbd5e1" font-size="14" font-weight="bold" text-anchor="middle">入力</text>
+                <path d="M 170 120 L 210 120" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                <!-- Update -->
+                <rect x="220" y="90" width="150" height="60" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+                <text x="295" y="115" fill="#cbd5e1" font-size="14" text-anchor="middle">ゲーム状態の更新</text>
+                <text x="295" y="135" fill="#10b981" font-size="16" font-weight="bold" text-anchor="middle">update()</text>
+                <path d="M 370 120 L 410 120" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                <!-- Draw -->
+                <rect x="420" y="90" width="130" height="60" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2" />
+                <text x="485" y="115" fill="#cbd5e1" font-size="14" text-anchor="middle">現在の状態を描画</text>
+                <text x="485" y="135" fill="#f59e0b" font-size="16" font-weight="bold" text-anchor="middle">draw()</text>
+
+                <!-- Loop back arrow -->
+                <path d="M 485 160 A 200 80 0 0 1 110 160" stroke="#64748b" stroke-width="2" fill="none" stroke-dasharray="4" marker-end="url(#arrow-gray)"/>
+                <text x="300" y="245" fill="#94a3b8" font-size="12" text-anchor="middle">次のフレームへ (Pyxelでは1秒間に30回繰り返す)</text>
+            </svg>
+
+            <p class="text-slate-300 mb-4">
+                <code>pyxel.run(update, draw)</code> は、まさにこの<strong>ループ処理を開始する合図</strong>だったのです。<br>
+                それぞれの関数がどんな役割（責務）を持っているか見てみましょう。
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-slate-800 p-5 rounded-lg border-t-4 border-emerald-500">
+                    <h4 class="text-lg font-bold text-emerald-400 mb-2">update() の役割</h4>
+                    <p class="text-sm text-slate-300 mb-3"><strong>ゲーム内部の「状態」を更新する関数</strong></p>
+                    <ul class="list-disc ml-5 text-sm text-slate-400 space-y-1">
+                        <li>キー入力を受け取る</li>
+                        <li>プレイヤーや敵の座標を変える</li>
+                        <li>HPやスコアを変更する</li>
+                        <li>当たり判定を行う</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800 p-5 rounded-lg border-t-4 border-amber-500">
+                    <h4 class="text-lg font-bold text-amber-400 mb-2">draw() の役割</h4>
+                    <p class="text-sm text-slate-300 mb-3"><strong>現在のゲームの「状態」を画面に描画する関数</strong></p>
+                    <ul class="list-disc ml-5 text-sm text-slate-400 space-y-1">
+                        <li>プレイヤーを描く</li>
+                        <li>敵や背景を描く</li>
+                        <li>文字（スコア等）を表示する</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">update()とdraw()を実験する</h3>
+            <p class="text-slate-300 mb-4">
+                本当にこの2つの関数が何度も呼ばれているのか、<code>print()</code> を使って実験してみましょう。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+def update():
+    print("update")
+
+def draw():
+    print("draw")
+
+pyxel.init(160, 120)
+pyxel.run(update, draw)</code></pre>
+            </div>
+
+            <p class="text-sm text-slate-400 mb-8 border-l-4 border-slate-600 pl-3">
+                ※ 実行するとターミナルに大量の文字が表示され続けます。確認できたら <code>Ctrl + C</code> でプログラムを強制終了してください。<br>
+                これはあくまで<strong>仕組みを確認するための実験用コード</strong>です。実際のゲーム制作では <code>update</code> や <code>draw</code> の中で <code>print</code> を多用するとゲームが重くなる原因になります。
+            </p>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">draw()で四角形を描く</h3>
+            <p class="text-slate-300 mb-4">
+                それでは、画面に実際にものを描画してみましょう。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+def update():
+    pass
+
+def draw():
+    # ① 画面全体を色0(黒)で塗りつぶす
+    pyxel.cls(0)
+
+    # ② x=70, y=50 の位置に 幅20, 高さ20 の 色7(白) の四角形を描く
+    pyxel.rect(70, 50, 20, 20, 7)
+
+pyxel.init(160, 120)
+pyxel.run(update, draw)</code></pre>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded mt-4 mb-6 border border-slate-700">
+                <p class="font-bold text-slate-300 text-sm mb-1">▶ 実行するとどうなる？</p>
+                <p class="text-sm text-slate-400">黒い画面の中央付近に、白い四角形が表示されます。</p>
+            </div>
+
+            <div class="bg-amber-950/40 border-l-4 border-amber-500 p-4 my-6">
+                <p class="font-bold text-amber-300 text-sm mb-2">⚠️ 注意：pyxel.cls() の cls は class ではありません！</p>
+                <p class="text-sm text-slate-300 mb-2">
+                    <code>pyxel.cls()</code> は <strong>Cl</strong>ear <strong>S</strong>creen（画面クリア）の略であり、画面全体を指定した色で塗りつぶすPyxelの関数です。第2章で学んだ Python の <code>class</code>（クラス）とは全く無関係ですので、絶対に混同しないでください。
+                </p>
+                <p class="text-sm text-amber-200 mt-2 font-bold">なぜ draw() の最初に cls() を呼ぶのか？</p>
+                <p class="text-sm text-slate-300">
+                    ゲームは毎フレーム新しく絵を描き直します。もし最初に画面をクリア（塗りつぶし）しないと、<strong>前のフレームで描いた絵がそのまま画面に残ってしまい、残像だらけになってしまう</strong>からです。
+                </p>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">xをゲームの状態にする</h3>
+            <p class="text-slate-300 mb-4">
+                現在は <code>70</code> という固定の数値を描画しています。これを動かすために、<strong>ゲームの状態（State）</strong>として変数 <code>x</code> に置き換えてみましょう。
+            </p>
+
+            <div class="bg-slate-800/80 border-l-4 border-blue-400 p-3 my-4 inline-block">
+                <p class="text-sm text-slate-300">【ゲームの状態】 その時点でゲームが持っている情報のこと。ここでは四角形のx座標が状態の一部になります。</p>
+            </div>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+x = 70  # 四角形の現在位置(状態)
+
+def update():
+    pass
+
+def draw():
+    pyxel.cls(0)
+    # 固定の 70 ではなく、変数 x の位置に描く
+    pyxel.rect(x, 50, 20, 20, 7)
+
+pyxel.init(160, 120)
+pyxel.run(update, draw)</code></pre>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">update()で状態を変える</h3>
+            <p class="text-slate-300 mb-4">
+                状態 <code>x</code> を準備できたので、いよいよ <code>update()</code> の中でこの状態を変化させましょう。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+x = 70
+
+def update():
+    global x  # 関数の外にある変数 x を変更するために必要
+    x += 1    # 毎フレーム x を 1 ずつ増やす
+
+def draw():
+    pyxel.cls(0)
+    pyxel.rect(x, 50, 20, 20, 7)
+
+pyxel.init(160, 120)
+pyxel.run(update, draw)</code></pre>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded mt-4 mb-6 border border-slate-700">
+                <p class="font-bold text-slate-300 text-sm mb-1">▶ 実行するとどうなる？</p>
+                <p class="text-sm text-slate-400">四角形が右方向へスーッと移動していきます。<br>（画面外に出てもエラーにはならず、そのまま消えていきます）</p>
+            </div>
+
+            <p class="text-slate-300 mb-4">
+                ここで初めて出てきた <strong><code>global</code></strong> はPythonの機能です。関数の外側で定義された変数 <code>x</code> を、関数 <code>update()</code> の内部で変更（上書き）するために宣言しています。<br><br>
+                このプログラムが動く仕組みを図で見てみましょう。
+            </p>
+
+            <!-- SVG: 状態更新と描画の関係 -->
+            <svg viewBox="0 0 500 200" class="w-full max-w-lg mx-auto my-6">
+                <defs>
+                    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                    </marker>
+                    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+                    </marker>
+                </defs>
+                
+                <!-- State x -->
+                <circle cx="250" cy="50" r="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                <text x="250" y="45" fill="#f1f5f9" font-size="14" font-weight="bold" text-anchor="middle">状態</text>
+                <text x="250" y="65" fill="#60a5fa" font-size="16" font-weight="bold" text-anchor="middle">x</text>
+
+                <!-- Update -->
+                <rect x="50" y="120" width="120" height="50" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                <text x="110" y="150" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle">update()</text>
+                
+                <path d="M 170 120 L 215 80" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)"/>
+                <text x="160" y="90" fill="#10b981" font-size="12">xを変化させる</text>
+
+                <!-- Draw -->
+                <rect x="330" y="120" width="120" height="50" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                <text x="390" y="150" fill="#f59e0b" font-size="14" font-weight="bold" text-anchor="middle">draw()</text>
+
+                <path d="M 285 80 L 330 120" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arrow-orange)"/>
+                <text x="350" y="90" fill="#f59e0b" font-size="12">変化したxを読み取る</text>
+            </svg>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">updateとdrawを分離する理由</h3>
+            <p class="text-slate-300 mb-4">
+                初心者によくある間違いとして、<code>draw()</code> の中で <code>x += 1</code> をしてしまうことがあります。<br>
+                しかし、設計上これは<strong>悪い例</strong>です。
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div class="bg-slate-800 p-4 rounded border border-red-500/50">
+                    <p class="font-bold text-red-400 text-sm mb-2">✕ 悪い例 (混在させる)</p>
+                    <p class="text-xs text-slate-300 font-mono mb-2">def draw():<br>&nbsp;&nbsp;global x<br>&nbsp;&nbsp;x += 1<br>&nbsp;&nbsp;pyxel.rect(x...)</p>
+                    <p class="text-xs text-slate-400">描画と状態変更が混ざると、後からプログラムが複雑になった時にバグの原因になります。</p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded border border-emerald-500/50">
+                    <p class="font-bold text-emerald-400 text-sm mb-2">〇 良い例 (責務を分離する)</p>
+                    <ul class="text-xs text-slate-300 space-y-1">
+                        <li><strong>update()</strong><br>→ ゲームの状態を変更する</li>
+                        <li><strong>draw()</strong><br>→ 現在の状態を描画する</li>
+                    </ul>
+                    <p class="text-xs text-slate-400 mt-2">役割（責務）をきっちり分けることで、プログラムが読みやすく安全になります。</p>
+                </div>
+            </div>
+
+            <!-- 確認問題 -->
+            <details class="bg-slate-800 p-4 rounded-md border border-slate-700 cursor-pointer mb-6">
+                <summary class="font-bold text-slate-200">Q. 確認問題：次のコードでは、四角形はどちらに移動するでしょう？</summary>
+                <div class="mt-4 text-slate-300 text-sm space-y-4">
+                    <pre class="bg-slate-950 p-3 rounded text-slate-300 font-mono text-xs">x = 70
+def update():
+    global x
+    x -= 1</pre>
+                    <ul class="list-none space-y-1">
+                        <li>A. 右</li>
+                        <li>B. 左</li>
+                        <li>C. 上</li>
+                        <li>D. 動かない</li>
+                    </ul>
+                    <div class="p-3 bg-slate-900 rounded border-l-4 border-blue-500">
+                        <p class="font-bold text-blue-400 mb-1">正解：B. 左</p>
+                        <p>理由：<code>x -= 1</code> は x の値を毎フレーム減らします。数学のグラフと同じように、x座標が減ると左方向へ移動します。</p>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- 4.3 座標と描画 -->
+        <section id="sec4-3" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">4.3 座標と描画</h2>
+            
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">Pyxelの座標系 (x, y)</h3>
+            <p class="text-slate-300 mb-4">
+                Pyxel（および多くのゲームエンジン）の2D座標系は、数学の授業で習うグラフとは<strong>y軸の向きが異なります。</strong><br>
+                左上が原点 <code>(0, 0)</code> となり、右に行くほど x が増え、<strong>下に行くほど y が増えます。</strong>
+            </p>
+
+            <!-- SVG: 座標系 -->
+            <svg viewBox="0 0 350 220" class="w-full max-w-sm mx-auto my-6">
+                <defs>
+                    <marker id="arrow-axis" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#cbd5e1"/>
+                    </marker>
+                </defs>
+                <rect width="350" height="220" fill="#0f172a" />
+                <rect x="50" y="40" width="250" height="150" fill="#020617" stroke="#334155" stroke-width="2"/>
+                
+                <!-- Origin -->
+                <circle cx="50" cy="40" r="4" fill="#ef4444"/>
+                <text x="45" y="30" fill="#f1f5f9" font-size="14" text-anchor="end">(0, 0)</text>
+
+                <!-- X axis -->
+                <line x1="50" y1="40" x2="330" y2="40" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow-axis)"/>
+                <text x="310" y="25" fill="#cbd5e1" font-size="14" font-weight="bold">x</text>
+                <text x="180" y="25" fill="#94a3b8" font-size="12">右へ行くほど増える</text>
+
+                <!-- Y axis -->
+                <line x1="50" y1="40" x2="50" y2="210" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow-axis)"/>
+                <text x="25" y="200" fill="#cbd5e1" font-size="14" font-weight="bold">y</text>
+                <text x="25" y="130" fill="#94a3b8" font-size="12" transform="rotate(-90 25,130)">下へ行くほど増える</text>
+            </svg>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">pyxel.rect()</h3>
+            <p class="text-slate-300 mb-4">
+                先ほど使った四角形を描く関数の引数を詳しく見てみましょう。<br>
+                <strong><code>pyxel.rect(x, y, width, height, color)</code></strong>
+            </p>
+            <ul class="list-disc ml-5 text-sm text-slate-300 space-y-2 mb-6">
+                <li><strong>x</strong>：四角形の左上のx座標</li>
+                <li><strong>y</strong>：四角形の左上のy座標</li>
+                <li><strong>width</strong>：幅（横の長さ）</li>
+                <li><strong>height</strong>：高さ（縦の長さ）</li>
+                <li><strong>color</strong>：色（0〜15の数字で指定。0は黒、7は白など）</li>
+            </ul>
+
+            <!-- SVG: rectの引数 -->
+            <svg viewBox="0 0 300 200" class="w-full max-w-sm mx-auto my-6">
+                <!-- Point x, y -->
+                <circle cx="80" cy="50" r="4" fill="#3b82f6"/>
+                <text x="75" y="40" fill="#60a5fa" font-size="14" font-weight="bold" text-anchor="end">x, y</text>
+
+                <!-- Rectangle -->
+                <rect x="80" y="50" width="140" height="90" fill="#1e293b" stroke="#cbd5e1" stroke-width="2"/>
+                
+                <!-- Width -->
+                <line x1="80" y1="160" x2="220" y2="160" stroke="#94a3b8" stroke-width="1"/>
+                <text x="150" y="175" fill="#cbd5e1" font-size="12" text-anchor="middle">width (幅)</text>
+                
+                <!-- Height -->
+                <line x1="240" y1="50" x2="240" y2="140" stroke="#94a3b8" stroke-width="1"/>
+                <text x="255" y="100" fill="#cbd5e1" font-size="12" dominant-baseline="middle">height (高さ)</text>
+            </svg>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">pyxel.text()</h3>
+            <p class="text-slate-300 mb-4">
+                画面に文字を表示する関数もあります。<br>
+                <strong><code>pyxel.text(x, y, text, color)</code></strong><br>
+                これを利用して、ゲームの状態（変数）を画面に表示させることができます。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python"># draw() の中に書く例
+def draw():
+    pyxel.cls(0)
+    # 単純な文字を表示
+    pyxel.text(10, 10, "Hello Pyxel!", 7)
+
+    # f文字列(第1章で学習)を使って、変数xの現在値を表示
+    pyxel.text(10, 20, f"x = {x}", 7)</code></pre>
+            </div>
+        </section>
+
+        <!-- 4.4 キーボード入力 -->
+        <section id="sec4-4" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">4.4 キーボード入力</h2>
+            
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">pyxel.btn()</h3>
+            <p class="text-slate-300 mb-4">
+                プレイヤーがキーボードを押したかどうかを判定するには、<strong><code>pyxel.btn()</code></strong> 関数を使用します。<br>
+                指定したキーが<strong>現在押されていれば <code>True</code>、押されていなければ <code>False</code></strong> を返します。
+            </p>
+            
+            <div class="bg-slate-800/80 border-l-4 border-blue-400 p-3 my-4 inline-block">
+                <p class="text-sm text-slate-300">【True / False】 真（正しい）か偽（正しくない）かを表すPythonの特別な値（真理値）です。</p>
+            </div>
+
+            <ul class="list-none space-y-2 text-sm text-slate-300 mb-6 bg-slate-900 p-4 rounded border border-slate-800">
+                <li><code class="text-blue-300">pyxel.btn(pyxel.KEY_LEFT)</code> : 左矢印キー</li>
+                <li><code class="text-blue-300">pyxel.btn(pyxel.KEY_RIGHT)</code> : 右矢印キー</li>
+                <li><code class="text-blue-300">pyxel.btn(pyxel.KEY_UP)</code> : 上矢印キー</li>
+                <li><code class="text-blue-300">pyxel.btn(pyxel.KEY_DOWN)</code> : 下矢印キー</li>
+            </ul>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">ifとの組み合わせ</h3>
+            <p class="text-slate-300 mb-4">
+                「もしキーが押されていたら、状態を変更する」という処理は、第1章で学んだ <code>if</code> 文と組み合わせることで実現します。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python"># update() の中に書く例
+def update():
+    global x
+
+    # 【Python】 if文
+    # 【Pyxel】 pyxel.btn()
+    if pyxel.btn(pyxel.KEY_LEFT):
+        x -= 1   # 左キーが押されていれば、xを減らす</code></pre>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">左右・上下の移動</h3>
+            <p class="text-slate-300 mb-4">
+                右移動、上移動、下移動も同様に追加できます。<br>
+                先ほどの座標系（下に行くほど y が増える）を思い出してください。
+            </p>
+
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">def update():
+    global x, y
+
+    if pyxel.btn(pyxel.KEY_LEFT):
+        x -= 1
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        x += 1
+        
+    if pyxel.btn(pyxel.KEY_UP):
+        y -= 1
+    if pyxel.btn(pyxel.KEY_DOWN):
+        y += 1</code></pre>
+            </div>
+        </section>
+
+        <!-- 4.5 小さなプログラムを作る -->
+        <section id="sec4-5" class="scroll-mt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">4.5 小さなプログラムを作る</h2>
+            
+            <p class="text-slate-300 mb-6">
+                ここまでの知識を総動員して、<strong>「矢印キーで四角形を自由に動かす」</strong>小さなプログラムを完成させましょう。<br>
+                最後には、第2・3章で学んだ<strong>「クラス」</strong>の考え方を取り入れます。
+            </p>
+
+            <h3 class="text-lg font-bold text-slate-200 mt-6 mb-2">Step 1：画面を作る</h3>
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+def update():
+    pass
+
+def draw():
+    pyxel.cls(0)
+
+pyxel.init(160, 120)
+pyxel.run(update, draw)</code></pre>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-200 mt-6 mb-2">Step 2：四角形を表示する</h3>
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python"># draw() を変更
+def draw():
+    pyxel.cls(0)
+    pyxel.rect(75, 55, 10, 10, 7)</code></pre>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-200 mt-6 mb-2">Step 3：x, yをゲーム状態として持つ</h3>
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python"># 関数の外に状態を追加
+x = 75
+y = 55
+
+def draw():
+    pyxel.cls(0)
+    pyxel.rect(x, y, 10, 10, 7)</code></pre>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-200 mt-6 mb-2">Step 4 & 5：キー入力を追加 (左右・上下移動)</h3>
+            <div class="code-container mb-6 w-full max-w-2xl">
+                <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">def update():
+    global x, y
+
+    if pyxel.btn(pyxel.KEY_LEFT):
+        x -= 1
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        x += 1
+    if pyxel.btn(pyxel.KEY_UP):
+        y -= 1
+    if pyxel.btn(pyxel.KEY_DOWN):
+        y += 1</code></pre>
+            </div>
+            
+            <h3 class="text-xl font-bold text-emerald-400 mt-10 mb-4 border-b border-emerald-800 pb-2">Step 6：Gameクラスにまとめる (最終コード)</h3>
+            <p class="text-slate-300 mb-4">
+                これまでは <code>global x, y</code> を使って状態を管理していましたが、本格的なゲームを作ろうとすると変数が無数に増えて破綻してしまいます。<br>
+                そこで、<strong>第2・3章で学んだクラス</strong>の出番です。「ゲーム本体」を1つのクラスとして設計し、<code>self.x</code> のように<strong>オブジェクトの属性（状態）</strong>として持たせます。
+            </p>
+
+            <div class="code-container mb-6 w-full">
+                <div class="bg-emerald-950/80 text-emerald-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-emerald-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-emerald-500 transition-colors z-10">Copy</button>
+                <pre class="rounded-t-none"><code class="language-python">import pyxel
+
+# 【Python】 第2章で学んだクラスの定義
+class Game:
+    def __init__(self):
+        # self.x, self.y がこのゲーム(オブジェクト)の状態
+        self.x = 70
+        self.y = 50
+
+    # 【Python】 selfを持つメソッド
+    def update(self):
+        # 【Pyxel】 キー入力判定
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x -= 1
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.x += 1
+        if pyxel.btn(pyxel.KEY_UP):
+            self.y -= 1
+        if pyxel.btn(pyxel.KEY_DOWN):
+            self.y += 1
+
+    def draw(self):
+        # 【Pyxel】 描画処理
+        pyxel.cls(0)
+        pyxel.rect(self.x, self.y, 10, 10, 7)
+
+# 【Python】 Gameクラスのインスタンス（オブジェクト）を作成
+game = Game()
+
+# 【Pyxel】 Pyxelの初期化
+pyxel.init(160, 120)
+
+# 【Pyxel/Python】 gameオブジェクトのメソッドをPyxelに渡してループ開始
+pyxel.run(game.update, game.draw)</code></pre>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded mt-4 mb-6 border border-slate-700">
+                <p class="font-bold text-slate-300 text-sm mb-1">▶ 実行するとどうなる？</p>
+                <p class="text-sm text-slate-400">
+                    矢印キーを使って、白い四角形を上下左右に自由に動かすことができます。<br>
+                    ※現状は画面外に出ることも可能ですし、敵や当たり判定などはまだ存在しません。
+                </p>
+            </div>
+
+            <h4 class="text-lg font-bold text-slate-200 mt-6 mb-2">最終コードのポイント</h4>
+            <ul class="list-disc ml-5 text-sm text-slate-300 space-y-3 mb-6">
+                <li><code>class Game:</code> と <code>__init__</code> を使って、ゲーム全体の初期状態（x, y）を準備しています。</li>
+                <li><code>global</code> を使わなくても、<code>self.x</code> <code>self.y</code> によってクラス内のどこからでも安全に状態を変更・読み取りできるようになりました。</li>
+                <li><code>pyxel.run(game.update, game.draw)</code> は、「関数を呼び出している」というより、<strong>「作成した game オブジェクトの update メソッドと draw メソッドを、Pyxelのループ機能にお任せ（渡している）」</strong>という意味になります。</li>
+            </ul>
+
+            <!-- 確認問題 -->
+            <details class="bg-slate-800 p-4 rounded-md border border-slate-700 cursor-pointer mb-6">
+                <summary class="font-bold text-slate-200">Q. 確認問題：次のうち、Pyxelの機能ではなく Python標準の機能（構文）であるものはどれ？</summary>
+                <div class="mt-4 text-slate-300 text-sm space-y-4">
+                    <ul class="list-none space-y-2">
+                        <li>A. pyxel.init()</li>
+                        <li>B. class Game:</li>
+                        <li>C. pyxel.rect()</li>
+                        <li>D. pyxel.btn()</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-slate-900 rounded border-l-4 border-blue-500">
+                        <p class="font-bold text-blue-400 mb-1">正解：B. class Game:</p>
+                        <p>理由：クラス（<code>class</code>）はPythonという言語自体の基本機能です。A, C, Dはすべて、ゲームを作るためにPyxelが提供している専用の関数です。この「Pythonの機能」と「Pyxelの機能」の区別がつくようになることが、上達の第一歩です。</p>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- この章で学んだこと -->
+        <section id="sec-summary" class="scroll-mt-10 border-t border-slate-800 pt-10">
+            <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                この章で学んだこと
+            </h2>
+            
+            <div class="bg-slate-800/50 p-6 rounded-lg border border-slate-700">
+                <ul class="list-disc ml-5 text-sm text-slate-300 space-y-3">
+                    <li><strong>Pyxel / ゲームエンジン</strong>：描画や入力を簡単に扱えるようにする仕組み。</li>
+                    <li><strong>pyxel.init()</strong>：ゲーム画面を準備する。</li>
+                    <li><strong>pyxel.run()</strong>：ゲームループを開始する。</li>
+                    <li><strong>ゲームループの基本構造</strong>：
+                        <ul class="list-none ml-2 mt-2 space-y-1 text-blue-300">
+                            <li>① <strong>入力</strong> を受け取る</li>
+                            <li>② <strong>update()</strong> でゲームの状態を変える</li>
+                            <li>③ <strong>draw()</strong> で現在の状態を画面に描く</li>
+                        </ul>
+                    </li>
+                    <li><strong>座標系</strong>：左上が (0, 0)。右へ行くと x が増え、<strong>下へ行くと y が増える。</strong></li>
+                    <li><strong>pyxel.cls()</strong>：画面を塗りつぶしてクリアする。<code>class</code>とは無関係。</li>
+                    <li><strong>pyxel.rect() / pyxel.text()</strong>：四角形や文字を描画する。</li>
+                    <li><strong>pyxel.btn()</strong>：キーボードの入力状態（True/False）を調べる。</li>
+                    <li><strong>クラスとの融合</strong>：変数が増えても破綻しないように、ゲーム全体を <code>Game</code> クラスとして設計する。</li>
+                </ul>
+            </div>
+
+            <!-- 次の章へ -->
+            <a href="../05/index.html" class="block mt-10 p-6 bg-gradient-to-r from-blue-900/50 to-slate-900 border border-blue-500/30 rounded-lg hover:border-blue-400 transition-colors group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-blue-300 mb-2 group-hover:text-blue-200 transition-colors">次の章へ</h3>
+                        <p class="text-sm text-slate-400">次の章では、今回学んだPyxelとクラスを組み合わせ、プレイヤー・敵・弾丸などを実際のゲームオブジェクトとして扱いながら、ゲームを完成させていきます。</p>
+                    </div>
+                    <svg class="w-8 h-8 text-blue-500 group-hover:text-blue-400 transform group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </div>
+            </a>
+        </section>
+
+    </main>
+</div>
+
+<footer class="text-center py-10 mt-10 border-t border-slate-800 bg-slate-900">
+    <div class="text-sm font-bold text-slate-500">
+        Pyxel Game Programming<br>
+        <span class="font-normal text-slate-600 mt-1 block">Chapter 04 — Pyxel入門</span>
+    </div>
+</footer>
+
+<script>
+    // Syntax Highlighting の初期化
+    hljs.highlightAll();
+
+    // コードブロックのワンタップコピー機能
+    function copyCode(element) {
+        const container = element.closest('.code-container');
+        if (!container) return;
+        
+        const code = container.querySelector('code').innerText;
+        const btn = container.querySelector('.copy-btn');
+        
+        if (window.getSelection().toString().length > 0 && element.tagName !== 'BUTTON') {
+            return;
+        }
+        
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = btn ? btn.innerText : '';
+
+            if (btn) {
+                btn.innerText = 'Copied!';
+                btn.classList.remove('bg-blue-600', 'bg-slate-600', 'bg-emerald-600', 'hover:bg-blue-500', 'hover:bg-slate-500', 'hover:bg-emerald-500');
+                btn.classList.add('bg-emerald-500');
+            }
+
+            setTimeout(() => {
+                if (btn) {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-emerald-500');
+                    if(originalText === 'Copy') {
+                         if(container.querySelector('.bg-emerald-950\\/80')){
+                            btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+                         } else if (container.querySelector('.bg-slate-800')) {
+                            btn.classList.add('bg-slate-600', 'hover:bg-slate-500');
+                         } else {
+                            btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                         }
+                    }
+                }
+            }, 2000);
+        }).catch(err => {
+            console.error('Copy failed: ', err);
+        });
+    }
+
+    // スクロールに応じた目次のアクティブハイライト機能
+    document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.toc-link');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                        link.classList.add('text-slate-400', 'border-transparent');
+                        
+                        if (link.getAttribute('href').slice(1) === entry.target.id) {
+                            link.classList.add('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                            link.classList.remove('text-slate-400', 'border-transparent');
+                        }
+                    });
+                }
+            });
+        }, { 
+            rootMargin: '-20% 0px -70% 0px' 
+        });
+
+        sections.forEach(section => observer.observe(section));
+    });
+</script>
+</body>
+</html>

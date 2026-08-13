@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>クラス1 ― データと処理をまとめる | IQ Python Workshop</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #e2e8f0; /* slate-200 */
+            scroll-behavior: smooth;
+        }
+
+        /* コードブロックのカスタマイズ */
+        pre {
+            margin: 0 !important;
+            padding: 1.25rem !important;
+            border-radius: 0.5rem;
+            background: #1e293b !important; /* slate-800 */
+            font-size: 0.9rem;
+            overflow-x: auto;
+            cursor: pointer; /* ワンタップコピー用 */
+            position: relative;
+            border: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+        
+        pre:hover {
+            border-color: #3b82f6; /* hover時に青い枠線でタップ可能であることを示唆 */
+        }
+
+        code.hljs {
+            font-family: 'Consolas', 'Monaco', 'Ubuntu Mono', monospace !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+        
+        .code-container {
+            position: relative;
+            height: 100%;
+        }
+        .code-container pre {
+            height: 100%;
+        }
+
+        /* 疑似要素で「Tap to Copy」を表示（ホバー時） */
+        @media (hover: hover) {
+            pre:hover::after {
+                content: 'Tap to Copy';
+                position: absolute;
+                bottom: 10px;
+                right: 15px;
+                font-size: 0.75rem;
+                color: #94a3b8;
+                pointer-events: none;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-10">
+        
+        <!-- 左側：目次（サイドバー） -->
+        <aside class="md:w-64 flex-shrink-0 hidden md:block">
+            <nav id="toc" class="sticky top-10 flex flex-col space-y-1 border-l-2 border-slate-800 pl-4">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">目次</p>
+                <a href="#intro" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">Introduction</a>
+                <a href="#sec2-1" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">2.1 C++の構造体を振り返る</a>
+                <a href="#sec2-2" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">2.2 Pythonのクラス</a>
+                <a href="#sec2-3" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">2.3 self</a>
+                <a href="#sec2-4" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">2.4 メソッド</a>
+                <a href="#sec2-5" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">2.5 データと処理をまとめる</a>
+                <a href="#sec2-6" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-800 transition">2.6 複数のオブジェクト</a>
+            </nav>
+        </aside>
+
+        <!-- 右側：メインコンテンツ -->
+        <main class="flex-1 space-y-16">
+            
+            <header class="border-b border-slate-700 pb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-100 tracking-tight">2. クラスの概念に触れてみよう</h1>
+                <p class="text-lg text-slate-400 mt-2">データと処理をまとめる概念について学ぼう</p>
+            </header>
+
+            <!-- 重要：この章の進め方 -->
+            <div class="bg-blue-900/40 border-l-4 border-blue-500 p-6 rounded-r-lg shadow-lg">
+                <h3 class="text-xl font-bold text-blue-300 mb-3 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    IMPORTANT: この章の進め方
+                </h3>
+                <p class="text-slate-200 font-medium leading-relaxed">
+                    この章では、掲載されているコードを<strong class="text-white border-b-2 border-blue-400">必ず自分のPCで入力して実行してください。</strong><br><br>
+                    コードを実行し、意図的に値を変更したり、わざとエラーを起こしたりして動作を確かめることが最も重要です。各セクションの最後にある「TRY」は必ず自分の手でコードを書いて確認しましょう。
+                </p>
+            </div>
+
+            <!-- Introduction -->
+            <section id="intro" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center">
+                    <span class="text-blue-500 mr-2">#</span> Introduction
+                </h2>
+                <div class="prose max-w-none text-slate-300 space-y-4">
+                    <p>この章では、Pythonの大きな山場である<strong>「クラス」</strong>について学びます。</p>
+                    
+                    クラスとは一言で言えば、<strong>「関連するデータと、それを操作する処理をひとまとめにする仕組み」</strong>です。</p>
+                    
+                    <p>ゲームのPlayerを作ります。Playerは「名前」「HP」「攻撃力」というデータと、「攻撃する」「回復する」という処理も行います。</p>
+                    <p>これを一つのまとまりとして扱うのがクラスの考え方です。</p>
+
+                    <!-- SVG 1: Player Concept -->
+                    <svg viewBox="0 0 400 240" class="w-full max-w-lg mx-auto my-8">
+                        <!-- Box -->
+                        <rect x="50" y="20" width="300" height="200" rx="12" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <!-- Header -->
+                        <rect x="50" y="20" width="300" height="40" rx="12" fill="#3b82f6" opacity="0.2"/>
+                        <text x="200" y="47" fill="#f8fafc" font-size="18" font-weight="bold" text-anchor="middle">Player</text>
+                        
+                        <!-- Data Section -->
+                        <text x="70" y="85" fill="#94a3b8" font-size="14" font-weight="bold">データ (属性)</text>
+                        <path d="M 80 100 L 80 140" stroke="#475569" stroke-width="2" fill="none"/>
+                        <path d="M 80 100 L 100 100" stroke="#475569" stroke-width="2" fill="none"/>
+                        <text x="110" y="105" fill="#e2e8f0" font-size="14">名前 (name)</text>
+                        <path d="M 80 120 L 100 120" stroke="#475569" stroke-width="2" fill="none"/>
+                        <text x="110" y="125" fill="#e2e8f0" font-size="14">HP (hp)</text>
+                        <path d="M 80 140 L 100 140" stroke="#475569" stroke-width="2" fill="none"/>
+                        <text x="110" y="145" fill="#e2e8f0" font-size="14">攻撃力 (attack_power)</text>
+
+                        <!-- Process Section -->
+                        <text x="220" y="85" fill="#94a3b8" font-size="14" font-weight="bold">処理 (メソッド)</text>
+                        <path d="M 230 100 L 230 120" stroke="#475569" stroke-width="2" fill="none"/>
+                        <path d="M 230 100 L 250 100" stroke="#475569" stroke-width="2" fill="none"/>
+                        <text x="260" y="105" fill="#60a5fa" font-size="14">attack()</text>
+                        <path d="M 230 120 L 250 120" stroke="#475569" stroke-width="2" fill="none"/>
+                        <text x="260" y="125" fill="#60a5fa" font-size="14">heal()</text>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- 2.1 C++の構造体を振り返る -->
+            <section id="sec2-1" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">2.1 C++の構造体を振り返る</h2>
+                
+                <p class="text-slate-300 mb-4">C++を用いてPlayerクラスを作ってみましょう。</p>
+                
+                <div class="code-container mb-6 w-full md:w-3/4">
+                    <div class="bg-slate-700 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded shadow hover:bg-slate-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+// 構造体の定義
+struct Player {
+    string name;
+    int hp;
+    int attack;
+};
+
+int main() {
+    // 構造体変数 alice の作成
+    Player alice;
+
+    // メンバへのアクセス
+    alice.name = "Alice";
+    alice.hp = 100;
+    alice.attack = 20;
+
+    cout << alice.name << "のHPは" << alice.hp << endl;
+    return 0;
+}</code></pre>
+                </div>
+
+                <div class="bg-slate-800/50 p-4 rounded-md mb-8">
+                    <ul class="list-disc ml-5 text-sm text-slate-300 space-y-2">
+                        <li><code>struct</code> を使うと、Playerに関係するデータをひとまとめにできます。</li>
+                        <li><code>name</code>, <code>hp</code>, <code>attack</code> は「メンバ」と呼ばれます。</li>
+                        <li><code>alice</code> はそこから作られた「構造体変数」です。</li>
+                        <li><code>alice.hp</code> のように「<code>.</code> (ドット)」を使ってメンバへアクセスします。</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4 text-red-400">構造体の問題提起：処理はどこに書く？</h3>
+                <p class="text-slate-300 mb-4">
+                    構造体を使うと「データ」はまとめられます。<br>
+                    しかし、<strong>「そのデータを操作する処理」</strong>はどうなるでしょうか？<br>
+                    例えば、Playerを回復させる <code>heal</code> 関数を作ると、次のようになります。
+                </p>
+
+                <div class="code-container mb-6 w-full md:w-3/4">
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-2 bg-slate-600 text-slate-200 text-xs px-3 py-1.5 rounded shadow hover:bg-slate-500 transition-colors z-10">Copy</button>
+                    <pre onclick="copyCode(this)"><code class="language-cpp">
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+struct Player {
+    string name;
+    int hp;
+    int attack;
+};
+
+// Playerのデータを操作する関数（構造体の外にある）
+void heal(Player& player) {
+    player.hp += 10;
+}
+int main() {
+
+    Player alice;
+
+    alice.name = "Alice";
+    alice.hp = 100;
+    alice.attack = 20;
+
+    cout << alice.name << "のHPは" << alice.hp << endl;
+    return 0;
+}</code></pre>
+                </div>
+
+                <p class="text-slate-300 mb-4">
+                    データは <code>Player</code> の中にまとまっているのに、処理である <code>heal</code> は外側にポツンと置かれています。<br>
+                    これでは、<strong>「Playerに関係するデータと処理がバラバラになっている」</strong>状態です。
+                </p>
+
+                <!-- SVG 2: C++ Struct vs Function -->
+                <svg viewBox="0 0 450 180" class="w-full max-w-lg mx-auto my-6">
+                    <!-- Struct Box -->
+                    <rect x="30" y="20" width="180" height="130" rx="8" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+                    <text x="120" y="45" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">struct Player (データ)</text>
+                    <text x="50" y="75" fill="#e2e8f0" font-size="14">├── string name</text>
+                    <text x="50" y="100" fill="#e2e8f0" font-size="14">├── int hp</text>
+                    <text x="50" y="125" fill="#e2e8f0" font-size="14">└── int attack</text>
+
+                    <!-- Function Box -->
+                    <rect x="250" y="45" width="160" height="80" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2" stroke-dasharray="4"/>
+                    <text x="330" y="70" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">外部の関数 (処理)</text>
+                    <text x="330" y="100" fill="#fca5a5" font-size="14" text-anchor="middle">heal(Player& p)</text>
+
+                    <!-- Arrow -->
+                    <path d="M 250 85 L 220 85" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+                        </marker>
+                    </defs>
+                </svg>
+
+                <p class="text-slate-300 font-bold mt-4">
+                    「このバラバラな状態を解決し、Playerに関係する処理もまとめてしまおう！」というのが、Pythonのクラスです。
+                </p>
+            </section>
+
+            <!-- 2.2 Pythonのクラス -->
+            <section id="sec2-2" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">2.2 Pythonのクラス</h2>
+
+                <p class="text-slate-300 mb-4">細かい文法を一つずつ覚える前に、まずは完成形のPythonコードを見てみましょう。<br>
+                一つずつ分解して見ていきます</p>
+
+                <div class="code-container mb-6 w-full">
+                    <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python (完成形)</div>
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-9 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Player:
+    def __init__(self, name, hp, attack):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack
+
+# クラスからオブジェクトを作る (具体的な名前をつける)
+alice = Player("Alice", 100, 20)
+bob = Player("Bob", 150, 30)
+
+# データの確認
+print(alice.name)          # 出力: Alice
+print(alice.hp)            # 出力: 100
+print(alice.attack_power)  # 出力: 20
+
+print(bob.name)            # 出力: Bob
+</code></pre>
+                <p class="text-slate-300 mb-4">
+                    Pythonでは <code>class クラス名:</code> と書くことでクラスを定義します。今回の学習では、C++の <code>struct</code> に対応するものだと考えてください。
+                </p>
+                <div class="flex flex-col md:flex-row gap-4 mb-8">
+                    <div class="code-container flex-1">
+                        <div class="bg-slate-700 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                        <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-cpp">struct Player {
+    ...
+};</code></pre>
+                    </div>
+                    <div class="code-container flex-1">
+                        <div class="bg-blue-950/80 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                        <pre class="rounded-t-none" onclick="copyCode(this)"><code class="language-python">class Player:
+    ...</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4">2.2.2 __init__</h3>
+                <p class="text-slate-300 mb-4">
+                    <code>__init__</code> (イニシャライズの略) は、<strong>オブジェクトを作ったときに最初に自動で呼ばれる初期化処理</strong>です。前後のアンダースコアは2つずつ（ <code>_</code> <code>_</code> <code>init</code> <code>_</code> <code>_</code> ）であることに注意してください。
+                </p>
+                <div class="code-container mb-4 w-full md:w-3/4">
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-2 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre onclick="copyCode(this)"><code class="language-python">    def __init__(self, name, hp, attack):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack</code></pre>
+                </div>
+                <p class="text-slate-300 mb-6">
+                    <code>alice = Player("Alice", 100, 20)</code> と実行したとき、引数が次のように渡されます。
+                </p>
+                
+                <!-- SVG 3: Init mapping -->
+                <svg viewBox="0 0 540 120" class="w-full max-w-lg mx-auto mb-8">
+                    <text x="20" y="30" fill="#f8fafc" font-family="monospace" font-size="16">Player( "Alice" , 100 , 20 )</text>
+                    
+                    <!-- 各引数から受け取り側のパラメータへ向かう矢印位置を最適化 -->
+                    <!-- "Alice" (x: 120) -> name (x: 215) -->
+                    <path d="M 120 40 L 175 80" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    
+                    <!-- 100 (x: 210) -> hp (x: 275) -->
+                    <path d="M 180 40 L 220 80" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    
+                    <!-- 20 (x: 275) -> attack (x: 320) -->
+                    <path d="M 225 40 L 275 80" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                    
+                    <text x="20" y="100" fill="#f8fafc" font-family="monospace" font-size="16">def __init__(self, name, hp, attack):</text>
+                    
+                    <defs>
+                        <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa"/>
+                        </marker>
+                    </defs>
+                </svg>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4">2.2.3 属性</h3>
+                <p class="text-slate-300 mb-4">
+                    <code>self.name</code> や <code>self.hp</code> は、そのオブジェクトが持っているデータのことです。これをPythonでは<strong>「属性 (Attribute)」</strong>と呼びます。C++のメンバ変数 <code>alice.name</code> に相当します。
+                </p>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4">2.2.4 クラスを使う</h3>
+                <p class="text-slate-300 mb-4">
+                    クラスは設計図にすぎません。実際に使うには <code>alice = Player(...)</code> のように実体を作ります。<br>
+                    同じ <code>Player</code> クラスから、<code>Alice</code> と <code>Bob</code> という全く別のデータを持ったキャラクターを作ることができます。
+                </p>
+
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 1 (必ず手元のPCで実行しましょう)
+                    </p>
+                    <p class="text-slate-300">
+                        上記のコードを自分のPCのエディタに入力し、実行してみましょう。<br>
+                        その後、<code>alice</code> のHPを <code>100</code> から <code>200</code> に変更して、出力が変わることを確認してください。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 2.3 self -->
+            <section id="sec2-3" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">2.3 self</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    Pythonのクラスを学ぶ上で、最もつまずきやすいのが <code>self</code> です。<br>
+                    <strong>「self ＝ 今操作している、そのオブジェクト自身」</strong>のことです。
+                </p>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4">selfとは何か</h3>
+                <p class="text-slate-300 mb-4">
+                    <code>alice = Player("Alice", 100, 20)</code> で作られたデータを操作しているとき、<code>self.name</code> は <code>alice.name</code> になります。<br>
+                    <code>bob = Player("Bob", 150, 30)</code> で作られたデータを操作しているとき、<code>self.name</code> は <code>bob.name</code> になります。
+                </p>
+
+                <!-- SVG 4: self concept -->
+                <svg viewBox="0 0 500 220" class="w-full max-w-lg mx-auto my-6">
+                    <rect x="200" y="10" width="100" height="40" rx="8" fill="#3b82f6" stroke="#93c5fd" stroke-width="2"/>
+                    <text x="250" y="35" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">Player クラス</text>
+                    
+                    <path d="M 230 50 L 150 90" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow-gray)"/>
+                    <path d="M 270 50 L 350 90" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow-gray)"/>
+
+                    <defs>
+                        <marker id="arrow-gray" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Alice Box -->
+                    <rect x="50" y="100" width="160" height="100" rx="8" fill="#1e293b" stroke="#60a5fa" stroke-width="2"/>
+                    <text x="130" y="125" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">alice (self)</text>
+                    <text x="70" y="150" fill="#e2e8f0" font-size="14">name = "Alice"</text>
+                    <text x="70" y="170" fill="#e2e8f0" font-size="14">hp = 100</text>
+                    <text x="70" y="190" fill="#e2e8f0" font-size="14">attack = 20</text>
+
+                    <!-- Bob Box -->
+                    <rect x="290" y="100" width="160" height="100" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="370" y="125" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">bob (self)</text>
+                    <text x="310" y="150" fill="#e2e8f0" font-size="14">name = "Bob"</text>
+                    <text x="310" y="170" fill="#e2e8f0" font-size="14">hp = 150</text>
+                    <text x="310" y="190" fill="#e2e8f0" font-size="14">attack = 30</text>
+                </svg>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4 mt-8">なぜselfが必要なのか</h3>
+
+                <div class="code-container mb-6 w-full md:w-1/2">
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-2 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre onclick="copyCode(this)"><code class="language-python">    def __init__(self, name):
+        # self.name と name は別物！
+        self.name = name
+# self.name に name = "Alice" が入る
+alice = Player("Alice") </code></pre>
+                </div>
+
+                <ul class="list-disc ml-5 text-slate-300 space-y-2 mb-8">
+                    <li>右辺の <code>name</code> は、<strong>引数として外から受け取った値</strong> ("Alice" など) です。</li>
+                    <li>左辺の <code>self.name</code> は、<strong>オブジェクト自身が持つ属性（データ保存用の箱）</strong>です。</li>
+                </ul>
+                <p class="text-slate-300">
+                    「受け取った値(<code>name</code>)を、自分自身のデータ(<code>self.name</code>)として記憶する」という意味になります。
+                </p>
+                
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8 mt-6">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 2
+                    </p>
+                    <p class="text-slate-300">
+                        さきほどのコードに、3人目のキャラクター <code>charlie</code> を追加してみましょう。<br>
+                        HPや攻撃力は好きな数値に設定し、<code>print</code> で正しくデータが設定されているか確認してください。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 2.4 メソッド -->
+            <section id="sec2-4" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">2.4 メソッド</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    2.1節で、C++の構造体では「データ」はまとめられても「処理」が外に出てしまうという問題がありました。<br>
+                    Pythonのクラスでは、<strong>クラスの中に処理を書く</strong>ことができます。これを<strong>「メソッド」</strong>と呼びます。<br><br>
+                    関数と同じ概念ですが、クラス内に書かれた関数を<strong>「メソッド」</strong>と呼びます。<br>
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-2 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre onclick="copyCode(this)"><code class="language-python">class Player:
+    def __init__(self, name, hp, attack):
+        self.name = name
+        self.hp = hp
+        self.attack_power = attack
+
+    # 回復するメソッド
+    def heal(self):
+        self.hp += 10
+        print(f"{self.name}は回復した！ HPが {self.hp} になった。")
+
+    # 攻撃するメソッド
+    def attack(self, damage):
+        print(f"{self.name}が{damage}のダメージを与えた！")
+
+# 実行部分
+alice = Player("Alice", 100, 20)
+
+# メソッドの呼び出し
+alice.heal()
+alice.attack(15)</code></pre>
+                </div>
+
+                <div class="bg-slate-800/80 border-l-4 border-blue-400 p-4 mb-8">
+                    <p class="text-sm text-slate-300">
+                        <code>alice.heal()</code> と呼び出すと、<code>heal(self)</code> の <code>self</code> には <code>alice</code> 自身が自動的に渡されます。<br>
+                        つまり、「alice自身のhpを10増やす」という処理が行われます。
+                    </p>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4 text-amber-400">属性名とメソッド名の衝突に注意</h3>
+                <p class="text-slate-300 mb-6">
+                    上記のコードで、攻撃力というデータ（属性）を <code>self.attack_power</code> とし、攻撃する処理（メソッド）を <code>attack()</code> としています。<br>
+                    もし属性も <code>self.attack</code> にしてしまうと、「データとしての攻撃力」と「処理としての攻撃」の名前が被ってしまい、Pythonが混乱してエラーになることがあります。<br>
+                    <strong>「データ」と「処理」は別物である</strong>ことを意識して名前を付けましょう。
+                </p>
+
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 3
+                    </p>
+                    <p class="text-slate-300">
+                        上記のコードを実行し、<code>alice.heal()</code> を2回連続で呼び出してみましょう。<br>
+                        HPが100 → 110 → 120と正しく増えていくことを確認してください。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 2.5 データと処理をまとめる -->
+            <section id="sec2-5" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">2.5 データと処理をまとめる</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    なぜクラスが必要なのでしょうか？ クラスを使わない場合と使った場合を比較してみましょう。
+                </p>
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4 text-red-400">クラスを使わない場合（データと処理がバラバラ）</h3>
+                <p class="text-slate-300 mb-4">
+                    もし変数だけでゲームを作ろうとすると、キャラクターが増えるたびに変数が大量に増え、誰のデータをどの関数が処理しているのか人間が頭の中で管理しなければなりません。
+                </p>
+                <div class="code-container mb-4 w-full md:w-3/4">
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-2 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre onclick="copyCode(this)"><code class="language-python"># データがバラバラ
+player1_hp = 100
+player1_attack = 20
+player2_hp = 150
+player2_attack = 30
+
+# 処理もバラバラ
+def player1_heal():
+    global player1_hp
+    player1_hp += 10</code></pre>
+                </div>
+
+                <!-- SVG 5: Before -->
+                <svg viewBox="0 0 500 160" class="w-full max-w-lg mx-auto mb-10">
+                    <text x="250" y="20" fill="#ef4444" font-size="16" font-weight="bold" text-anchor="middle">クラスを使う前（バラバラ）</text>
+                    
+                    <rect x="30" y="40" width="120" height="90" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+                    <text x="90" y="65" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Player1</text>
+                    <text x="45" y="90" fill="#e2e8f0" font-size="12">├── hp=100</text>
+                    <text x="45" y="110" fill="#e2e8f0" font-size="12">└── attack=20</text>
+
+                    <rect x="190" y="40" width="120" height="90" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+                    <text x="250" y="65" fill="#f8fafc" font-size="14" font-weight="bold" text-anchor="middle">Player2</text>
+                    <text x="205" y="90" fill="#e2e8f0" font-size="12">├── hp=150</text>
+                    <text x="205" y="110" fill="#e2e8f0" font-size="12">└── attack=30</text>
+                    
+                    <rect x="340" y="55" width="130" height="60" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2" stroke-dasharray="4"/>
+                    <text x="405" y="75" fill="#fca5a5" font-size="12" text-anchor="middle">player1_heal()</text>
+                    <text x="405" y="95" fill="#fca5a5" font-size="12" text-anchor="middle">player2_heal()</text>
+                </svg>
+
+
+                <h3 class="text-lg font-bold text-slate-200 mb-4 text-emerald-400">クラスを使った後（カプセル化）</h3>
+                <p class="text-slate-300 mb-4">
+                    クラスを使うと、「このデータと処理はセットだよ」ということが明確になります。<br>
+                    <strong>「誰のデータを、どの処理が操作するのか」</strong>が自動的に整理されるのです。
+                </p>
+
+                <!-- SVG 6: After -->
+                <svg viewBox="0 0 500 200" class="w-full max-w-lg mx-auto mb-6">
+                    <text x="250" y="20" fill="#10b981" font-size="16" font-weight="bold" text-anchor="middle">クラスを使った後（まとまっている）</text>
+                    
+                    <rect x="100" y="40" width="300" height="140" rx="12" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="250" y="65" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">Player</text>
+
+                    <!-- Left Data -->
+                    <text x="170" y="95" fill="#94a3b8" font-size="14" font-weight="bold" text-anchor="middle">データ</text>
+                    <text x="130" y="120" fill="#e2e8f0" font-size="12">├── name</text>
+                    <text x="130" y="140" fill="#e2e8f0" font-size="12">├── hp</text>
+                    <text x="130" y="160" fill="#e2e8f0" font-size="12">└── attack_power</text>
+
+                    <!-- Right Logic -->
+                    <text x="330" y="95" fill="#94a3b8" font-size="14" font-weight="bold" text-anchor="middle">処理</text>
+                    <text x="290" y="120" fill="#60a5fa" font-size="12">├── attack()</text>
+                    <text x="290" y="140" fill="#60a5fa" font-size="12">└── heal()</text>
+                </svg>
+
+            </section>
+
+            <!-- 2.6 複数のオブジェクト -->
+            <section id="sec2-6" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">2.6 複数のオブジェクト</h2>
+                
+                <p class="text-slate-300 mb-4">
+                    最後に、同じクラスから複数のキャラクターを作って動かしてみましょう。
+                </p>
+
+                <div class="code-container mb-6 w-full">
+                    <button onclick="copyCode(this)" class="copy-btn absolute right-2 top-2 bg-blue-600 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-500 transition-colors z-10">Copy</button>
+                    <pre onclick="copyCode(this)"><code class="language-python"># 前節と同じPlayerクラスを使います
+
+alice = Player("Alice", 100, 20)
+bob = Player("Bob", 150, 30)
+
+print(f"回復前: Alice HP={alice.hp}, Bob HP={bob.hp}")
+
+# aliceだけが回復する
+alice.heal()
+
+print(f"回復後: Alice HP={alice.hp}, Bob HP={bob.hp}")</code></pre>
+                </div>
+
+                <p class="text-slate-300 mb-6">
+                    これを実行すると、<code>alice.heal()</code> を呼んだことで <code>alice.hp</code> は 110 になりますが、<code>bob.hp</code> は 150 のままであることがわかります。<br>
+                    <strong>「selfはそのオブジェクト自身」</strong>なので、Aliceが回復してもBobのHPには影響しないのです。
+                </p>
+
+                <div class="bg-slate-800/80 border-l-4 border-purple-500 p-4 mb-8">
+                    <p class="font-bold text-purple-400 mb-2 text-sm">💡 オブジェクトという用語</p>
+                    <p class="text-sm text-slate-300 space-y-1">
+                        ここで正式なプログラミング用語を一つ覚えておきましょう。<br>
+                        ・<code>Player</code> → <strong>クラス</strong> (設計図)<br>
+                        ・<code>alice</code> や <code>bob</code> → <strong>オブジェクト</strong> (設計図から作られた実体)<br>
+                        ※オブジェクトの代わりに「インスタンス」と呼ぶこともあります。意味はほぼ同じです。
+                    </p>
+                </div>
+
+                <div class="bg-slate-800 border border-emerald-500/50 rounded-md p-5 mb-8">
+                    <p class="font-bold text-emerald-400 mb-3 text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY 4
+                    </p>
+                    <ul class="list-disc ml-5 text-slate-300 space-y-3">
+                        <li><strong>TRY 4:</strong> 上記のコードを実行し、<code>bob.hp</code> が本当に変化していないか自分の目で確認しましょう。</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="text-center py-10 mt-10 border-t border-slate-800 bg-slate-900">
+        <div class="text-sm font-bold text-slate-500">
+            IQ Python Workshop 2026 - Rep. Takiguchi
+        </div>
+    </footer>
+
+    <script>
+        // Syntax Highlightingの初期化
+        hljs.highlightAll();
+
+        // ワンタップ（クリック）でコードをコピーする機能
+        function copyCode(element) {
+            // クリックされたのがpre要素かbutton要素かを判定してコンテナを取得
+            const container = element.closest('.code-container');
+            if (!container) return;
+            
+            const code = container.querySelector('code').innerText;
+            const btn = container.querySelector('.copy-btn');
+            
+            // ユーザーがテキストを選択している場合はコピーを発動しない（手動コピーを妨げないため）
+            if (window.getSelection().toString().length > 0 && element.tagName !== 'BUTTON') {
+                return;
+            }
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
+
+                // 成功時のフィードバック (ボタンの見た目変更)
+                btn.innerText = 'Copied!';
+                btn.classList.remove('bg-blue-600', 'bg-slate-600', 'hover:bg-blue-500', 'hover:bg-slate-500');
+                btn.classList.add('bg-emerald-500');
+
+                // 2秒後に元に戻す
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-emerald-500');
+                    // 元のクラスに復元 (親のヘッダー色を見てPythonかC++か簡易判定)
+                    if(container.querySelector('.bg-slate-700')) {
+                        btn.classList.add('bg-slate-600', 'hover:bg-slate-500');
+                    } else {
+                        btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                    }
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        // スクロール位置に応じた目次のハイライト
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.toc-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            // リセット
+                            link.classList.remove('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                            link.classList.add('text-slate-400', 'border-transparent');
+                            
+                            // アクティブ化
+                            if (link.getAttribute('href').slice(1) === entry.target.id) {
+                                link.classList.add('bg-slate-800', 'text-blue-400', 'border-blue-500', 'font-bold');
+                                link.classList.remove('text-slate-400', 'border-transparent');
+                            }
+                        });
+                    }
+                });
+            }, { 
+                rootMargin: '-20% 0px -70% 0px' 
+            });
+
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>

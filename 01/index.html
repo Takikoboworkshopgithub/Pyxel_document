@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Python入門 ― C++との違いから学ぶPython | IQ Python Workshop</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #0d2f62; /* slate-950 */
+            color: #f1f5f9; /* slate-100 */
+            scroll-behavior: smooth;
+        }
+
+        /* コードブロックのカスタマイズ */
+        pre {
+            margin: 0 !important;
+            padding: 1.25rem !important;
+            border-radius: 0.5rem;
+            background: #0f172a !important; /* slate-900 */
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        code.hljs {
+            font-family: 'Consolas', 'Monaco', 'Ubuntu Mono', monospace !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+        
+        /* 比較用カードのレイアウト調整 */
+        .code-container {
+            position: relative;
+            height: 100%;
+        }
+        .code-container pre {
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="antialiased bg-slate-950 text-slate-100">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-10">
+        
+        <!-- 左側：目次（サイドバー） -->
+        <aside class="md:w-64 flex-shrink-0 hidden md:block">
+            <nav id="toc" class="sticky top-10 flex flex-col space-y-1 border-l-2 border-slate-800 pl-4">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">目次</p>
+                <a href="#intro" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-900 transition">Introduction</a>
+                <a href="#sec1-1" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-900 transition">1.1 変数・式</a>
+                <a href="#sec1-2" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-900 transition">1.2 条件分岐・繰り返し</a>
+                <a href="#sec1-3" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-900 transition">1.3 リスト</a>
+                <a href="#sec1-4" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-900 transition">1.4 関数</a>
+                <a href="#sec1-5" class="toc-link block py-2 px-3 text-sm rounded-r-md border-l-2 -ml-[18px] border-transparent text-slate-400 hover:bg-slate-900 transition">1.5 Pythonらしい記法</a>
+            </nav>
+        </aside>
+
+        <!-- 右側：メインコンテンツ -->
+        <main class="flex-1 space-y-16">
+            
+            <header class="border-b border-slate-800 pb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-100 tracking-tight">Pythonに入門してみよう</h1>
+                <p class="text-lg text-slate-400 mt-2">C++との違いから学ぶ</p>
+            </header>
+
+            <!-- Introduction -->
+            <section id="intro" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center">
+                    <span class="text-blue-500 mr-2">#</span> Introduction
+                </h2>
+                <div class="prose max-w-none text-slate-300 space-y-4">
+                    <h3 class="text-lg font-bold text-slate-200">Pythonとは</h3>
+                    <p>シンプルで読みやすく、AI開発やデータ分析、さらにはゲーム制作まで幅広く使われている言語です。</p>
+                    
+                    <h3 class="text-lg font-bold text-slate-200 mt-6">C++との違い</h3>
+                    <p>C++は「実行速度」や「メモリ管理」に優れていますが、Pythonは「コードを書く速さ」と「可読性」に特化しています。型の宣言や複雑な記号を省略できるため、直感的にコードを記述できます。</p>
+                    
+                    <h3 class="text-lg font-bold text-slate-200 mt-6">この教材の目標</h3>
+                    <p>本教材は、C++の基礎を終えた皆さんが、Pythonの文法を最短で理解するためのものです。<br>
+                    最終的には、<strong>Pyxelを使ったゲーム制作へスムーズに移行できること</strong>を目指します。</p>
+                </div>
+            </section>
+
+            <!-- 1.1 変数・式 -->
+            <section id="sec1-1" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">1.1 変数・式</h2>
+                
+                <h3 class="text-lg font-bold text-slate-300 mb-4">変数宣言</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="code-container">
+                        <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded shadow hover:bg-slate-600 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-cpp">int x = 10;
+double y = 3.14;</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-blue-950 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">x = 10
+y = 3.14</code></pre>
+                    </div>
+                </div>
+<br>
+                <div class="bg-slate-900 border-l-4 border-blue-500 p-4 mb-8 rounded-r-md">
+                    <p class="font-bold text-blue-400 mb-1 text-sm">POINT</p>
+                    <ul class="list-disc ml-5 text-sm text-slate-300 space-y-1">
+                        <li>Pythonは<strong>型宣言が不要</strong>です。</li>
+                        <li>文末の <code>;</code>（セミコロン）も不要です。</li>
+                        <li>Pythonのint型はほかの言語と違い、どんなに大きな数値でも扱えます。これを<strong>任意精度整数</strong>といいます。</li>
+                    </ul>
+                </div>
+
+                <p class="text-slate-300 mb-4">
+                    Pythonの変数はC系の言語と違い、途中で全く違う型の値を入れることも可能です。
+                </p>
+                <div class="code-container mb-8 w-full md:w-1/2">
+                    <button onclick="copyCode(this)" class="absolute right-2 top-2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                    <pre><code class="language-python">x = 10
+x = "hello"  # エラーにならない！</code></pre>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">割り算（ / と // ）</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="code-container">
+                        <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded shadow hover:bg-slate-600 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-cpp">5 / 2   // 結果は 2 (整数同士なので切り捨て)
+5.0 / 2 // 結果は 2.5</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-blue-950 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">5 / 2   # 結果は 2.5 (通常の除算)
+5 // 2  # 結果は 2 (切り捨て除算)</code></pre>
+                    </div>
+                </div>
+                
+                <h3 class="text-lg font-bold text-slate-300 mb-4 mt-8">複数代入</h3>
+                <p class="text-slate-300 mb-4">Pythonでは、複数の変数にまとめて値を代入する便利な記法があります。</p>
+                <div class="code-container mb-8 w-full md:w-1/2">
+                    <button onclick="copyCode(this)" class="absolute right-2 top-2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                    <pre><code class="language-python">x, y = 1, 2
+y, x = x, y  # xとyの値を入れ替える</code></pre>
+                    </code></pre>
+                </div>
+            </section>
+
+            <!-- 1.2 条件分岐・繰り返し -->
+            <section id="sec1-2" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">1.2 条件分岐・繰り返し</h2>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">if / elif / else</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="code-container">
+                        <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded shadow hover:bg-slate-600 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-cpp">if (x > 0) {
+    cout << "positive" << endl;
+} else if (x == 0) {
+    cout << "zero" << endl;
+} else {
+    if (x < 10) {
+        cout << "very negative" << endl;
+    }
+    else {
+        cout << "negative" << endl;
+    }
+}</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-blue-950 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">if x > 0:
+    print("positive")
+elif x == 0:
+    print("zero")
+else:
+    if x < 10:
+        print("very negative")
+    else:
+        print("negative")
+    </code></pre>
+                    </div>
+                </div>
+<br>
+                <div class="bg-slate-900 border-l-4 border-blue-500 p-4 mb-8 rounded-r-md">
+                    <p class="font-bold text-blue-400 mb-1 text-sm">POINT</p>
+                    <ul class="list-disc ml-5 text-sm text-slate-300 space-y-1">
+                        <li><code>{}</code> の代わりに<strong>インデント（字下げ）</strong>を使ってブロックを表します。</li>
+                        <li>条件式の <code>()</code> は不要ですが、行末に <strong><code>:</code>（コロン）</strong>が必須です。</li>
+                        <li><code>else if</code> は <code>elif</code> と書きます。</li>
+                        <li>出力には <code>cout</code> ではなく <code>print()</code> を使います。</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">forループ</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="code-container">
+                        <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded shadow hover:bg-slate-600 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-cpp">for (int i = 0; i < 10; i++) {
+    cout << i << endl;
+}</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-blue-950 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">for i in range(10):
+    print(i)</code></pre>
+                    </div>
+                </div>
+                <p class="text-slate-300 mb-8">
+                    Pythonでは <code>range(10)</code> を使うことで、「0 から 9 まで」の連続した数値を生成します。終了条件やインクリメント(<code>i++</code>)を直接書く必要がありません。
+                </p>
+
+                <div class="bg-slate-900 border border-emerald-500/30 rounded-md p-4">
+                    <p class="font-bold text-emerald-400 mb-2 text-sm flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY
+                    </p>
+                    <p class="text-sm text-slate-300"><code>range</code> を使って、1 から 5 までの数字を <code>print</code> で出力してみよう。（ヒント: <code>range(開始, 終了)</code> と書くこともできる）</p>
+                </div>
+            </section>
+
+            <!-- 1.3 リスト -->
+            <section id="sec1-3" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">1.3 リスト</h2>
+                <p class="text-slate-300 mb-4">C++の <code>配列</code> や <code>vector</code> に相当するのが、Pythonの「リスト」です。</p>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">リストの基本操作</h3>
+                <div class="code-container mb-6 w-full md:w-3/4">
+                    <button onclick="copyCode(this)" class="absolute right-2 top-2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                    <pre><code class="language-python">a = [10, 20, 30]
+
+# 添字によるアクセス（C++と同じ）
+print(a[0])    # 10 が出力される
+
+# 要素の変更（C++と同じ）
+a[0] = 100    # a =[100, 20, 30] になる
+
+# 動的に要素を追加（C++の push_back に相当）
+a.append(40)    # a =[100, 20, 30, 40] になる
+
+#添え字によるアクセス (後ろから)
+print(a[-1])    # 後ろから1番目の意味 40が出力される
+print(a[-2])     # 後ろから2目の意味 30が出力される
+</code></pre>
+                </div>
+                <p class="text-slate-300 mb-8">
+                    添字を使ったアクセスはC++と全く同じですが、固定長配列とは異なり <code>append()</code> メソッドを使っていつでも要素を追加できます。
+                </p>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">スライス</h3>
+                <p class="text-slate-300 mb-4">
+                    Python独自の強力な機能が「スライス」です。<code>a[開始:終了]</code> と書くことで、リストの一部を簡単に切り出せます。（終了位置の要素は含まれません）
+                </p>
+                <div class="code-container mb-8 w-full md:w-3/4">
+                    <button onclick="copyCode(this)" class="absolute right-2 top-2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                    <pre><code class="language-python">a = [10, 20, 30, 40, 50]
+
+# インデックス1から3（4未満）までを取得
+print(a[1:4])  # [20, 30, 40]
+# インデックス0から2（3未満）までを取得
+print(a[:3])   # [10, 20, 30] 最初が0の場合は省略できる
+# 逆順に取得 (少し発展)
+print(a[::-1])  # [50, 40, 30, 20, 10]
+</code></pre>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">リストのループ (C++でいう拡張for文に相当)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="code-container">
+                        <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded shadow hover:bg-slate-600 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-cpp">for (int x : a) {
+    cout << x << endl;
+}</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-blue-950 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">for x in a:
+    print(x)
+# 10
+# 20
+# 30
+# 40
+# 50
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-emerald-500/30 rounded-md p-4">
+                    <p class="font-bold text-emerald-400 mb-2 text-sm flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY
+                    </p>
+                    <p class="text-sm text-slate-300"><code>a = [1, 2, 3, 4, 5]</code> から、スライスを使って <code>[2, 3, 4]</code> の部分だけを取り出してみよう。</p>
+                </div>
+            </section>
+
+            <!-- 1.4 関数 -->
+            <section id="sec1-4" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">1.4 関数</h2>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">関数の定義</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="code-container">
+                        <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">C++</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded shadow hover:bg-slate-600 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-cpp">int add(int a, int b) {
+    return a + b;
+}
+
+// 呼び出し
+int result = add(3, 5);</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-blue-950 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">Python</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">def add(a, b):
+    return a + b
+
+# 呼び出し
+result = add(3, 5)</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border-l-4 border-blue-500 p-4 mb-8 rounded-r-md">
+                    <p class="font-bold text-blue-400 mb-1 text-sm">POINT</p>
+                    <ul class="list-disc ml-5 text-sm text-slate-300 space-y-1">
+                        <li>関数の宣言には <strong><code>def</code></strong> を使います。</li>
+                        <li>戻り値の型（<code>int</code>など）も、引数の型も記述する必要がありません。</li>
+                        <li>if文などと同じく、末尾の <code>:</code> とブロックのインデントを忘れないようにしましょう。</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-900 border border-emerald-500/30 rounded-md p-4">
+                    <p class="font-bold text-emerald-400 mb-2 text-sm flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY
+                    </p>
+                    <p class="text-sm text-slate-300">引数に名前（文字列）を受け取り、「Hello, [名前]」と表示する関数 <code>greet(name)</code> を作成してみよう。</p>
+                </div>
+            </section>
+
+            <!-- 1.5 Pythonらしい記法 -->
+            <section id="sec1-5" class="scroll-mt-10">
+                <h2 class="text-2xl font-bold text-slate-100 mb-6 border-l-4 border-blue-500 pl-3">1.5 Pythonらしい記法</h2>
+                <p class="text-slate-300 mb-6">C++経験者が最初に戸惑うかもしれない、しかし慣れると非常に強力なPythonならではの記法をいくつか紹介します。</p>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">所属検査（in）</h3>
+                <p class="text-slate-300 mb-4">C++で「配列に特定の要素が含まれているか」を調べる場合、ループを回すか関数を使う必要がありますが、Pythonでは <code>in</code> だけで直接記述できます。</p>
+                <div class="code-container mb-8 w-full md:w-3/4">
+                    <button onclick="copyCode(this)" class="absolute right-2 top-2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                    <pre><code class="language-python">a = ["apple", "banana", "orange"]
+
+if "banana" in a:
+    print("ある")</code></pre>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-300 mb-4">リスト内包表記</h3>
+                <p class="text-slate-300 mb-4">
+                    既存のリストから新しいリストを生成する際、通常の <code>for</code> 文を1行にまとめてスッキリ書くことができます。これは短く書ける魔法の構文というより、「<code>for</code>文の圧縮版」と捉えると理解しやすいです。
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="code-container">
+                        <div class="bg-slate-800 text-slate-300 text-xs font-bold py-1 px-3 rounded-t-md">通常の書き方</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-slate-700 text-slate-200 text-xs px-2 py-1 rounded shadow hover:bg-slate-600 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">b = []
+
+for x in a:
+    b.append(x * 2)</code></pre>
+                    </div>
+                    <div class="code-container">
+                        <div class="bg-blue-950 text-blue-300 text-xs font-bold py-1 px-3 rounded-t-md">リスト内包表記</div>
+                        <button onclick="copyCode(this)" class="absolute right-2 top-9 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow hover:bg-blue-500 transition-colors">Copy</button>
+                        <pre class="rounded-t-none"><code class="language-python">b = [x * 2 for x in a]</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-emerald-500/30 rounded-md p-4">
+                    <p class="font-bold text-emerald-400 mb-2 text-sm flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        TRY
+                    </p>
+                    <p class="text-sm text-slate-300"><code>nums = [1, 2, 3]</code> から、各要素に 10 を足した新しいリストをリスト内包表記で作ってみよう。</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="text-center py-10 mt-10 border-t border-slate-800 bg-slate-900">
+        <div class="text-sm font-bold text-slate-400">
+            IQ Python Workshop 2026 - Rep. Takiguchi
+        </div>
+    </footer>
+
+    <script>
+        // Syntax Highlightingの初期化
+        hljs.highlightAll();
+
+        // 過去の修正履歴要件「すべてのコードブロックをワンタップでコピー可能にする」を実装
+        function copyCode(btn) {
+            const container = btn.closest('.code-container');
+            const code = container.querySelector('code').innerText;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
+                const originalBg = btn.className;
+
+                // 成功時のフィードバック
+                btn.innerText = 'Copied!';
+                btn.classList.remove('bg-blue-600', 'bg-slate-700', 'hover:bg-blue-500', 'hover:bg-slate-600');
+                btn.classList.add('bg-emerald-500');
+
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.className = originalBg;
+                }, 2000);
+            });
+        }
+
+        // スクロール位置に応じた目次のハイライト
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.toc-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('bg-blue-950', 'text-blue-400', 'border-blue-500', 'font-bold');
+                            link.classList.add('text-slate-400', 'border-transparent');
+                            
+                            if (link.getAttribute('href').slice(1) === entry.target.id) {
+                                link.classList.add('bg-blue-950', 'text-blue-400', 'border-blue-500', 'font-bold');
+                                link.classList.remove('text-slate-400', 'border-transparent');
+                            }
+                        });
+                    }
+                });
+            }, { 
+                rootMargin: '-20% 0px -70% 0px' 
+            });
+
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>
