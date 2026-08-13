@@ -393,7 +393,7 @@ pyxel.run(update, draw)</code></pre>
                     <p class="text-sm text-slate-300 mb-3"><strong>現在のゲームの「状態」を画面に描画する関数</strong></p>
                     <ul class="list-disc ml-5 text-sm text-slate-400 space-y-1">
                         <li>プレイヤーを描く</li>
-                        <li>敵や背景を描く</li>
+                        <li>敵や背景を順番に描く(重要)</li>
                         <li>文字（スコア等）を表示する</li>
                     </ul>
                 </div>
@@ -457,6 +457,11 @@ pyxel.run(update, draw)</code></pre>
                 <p class="text-sm text-amber-200 mt-2 font-bold">なぜ draw() の最初に cls() を呼ぶのか？</p>
                 <p class="text-sm text-slate-300">
                     ゲームは毎フレーム新しく絵を描き直します。もし最初に画面をクリア（塗りつぶし）しないと、<strong>前のフレームで描いた絵がそのまま画面に残ってしまい、残像だらけになってしまう</strong>からです。
+                </p>
+                <p class="text-sm text-amber-200 mt-2 font-bold"><code>cls()</code>が<code>rect()</code>の前に必要なのか</p>
+                <p class="text-sm text-slate-300">
+                    もし <code>cls()</code> を <code>rect()</code> の後に書くと、四角形を描いた直後に画面全体が黒で塗りつぶされてしまい、四角形が見えなくなってしまいます。<br>
+                    そのため、<code>cls()</code> は必ず <code>rect()</code> より前に書く必要があります。
                 </p>
             </div>
 
@@ -543,7 +548,7 @@ pyxel.run(update, draw)</code></pre>
                 <text x="110" y="150" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle">update()</text>
                 
                 <path d="M 170 120 L 215 80" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)"/>
-                <text x="160" y="90" fill="#10b981" font-size="12">xを変化させる</text>
+                <text x="80" y="90" fill="#10b981" font-size="12">xを変化させる</text>
 
                 <!-- Draw -->
                 <rect x="330" y="120" width="120" height="50" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
@@ -555,8 +560,7 @@ pyxel.run(update, draw)</code></pre>
 
             <h3 class="text-xl font-bold text-slate-200 mt-8 mb-4">updateとdrawを分離する理由</h3>
             <p class="text-slate-300 mb-4">
-                初心者によくある間違いとして、<code>draw()</code> の中で <code>x += 1</code> をしてしまうことがあります。<br>
-                しかし、設計上これは<strong>悪い例</strong>です。
+                <code>draw()</code> の中で <code>x += 1</code> をしてしまうのは、設計上<strong>悪い例</strong>です。
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -872,22 +876,7 @@ pyxel.run(game.update, game.draw)</code></pre>
                 <li><code>pyxel.run(game.update, game.draw)</code> は、「関数を呼び出している」というより、<strong>「作成した game オブジェクトの update メソッドと draw メソッドを、Pyxelのループ機能にお任せ（渡している）」</strong>という意味になります。</li>
             </ul>
 
-            <!-- 確認問題 -->
-            <details class="bg-slate-800 p-4 rounded-md border border-slate-700 cursor-pointer mb-6">
-                <summary class="font-bold text-slate-200">Q. 確認問題：次のうち、Pyxelの機能ではなく Python標準の機能（構文）であるものはどれ？</summary>
-                <div class="mt-4 text-slate-300 text-sm space-y-4">
-                    <ul class="list-none space-y-2">
-                        <li>A. pyxel.init()</li>
-                        <li>B. class Game:</li>
-                        <li>C. pyxel.rect()</li>
-                        <li>D. pyxel.btn()</li>
-                    </ul>
-                    <div class="mt-4 p-3 bg-slate-900 rounded border-l-4 border-blue-500">
-                        <p class="font-bold text-blue-400 mb-1">正解：B. class Game:</p>
-                        <p>理由：クラス（<code>class</code>）はPythonという言語自体の基本機能です。A, C, Dはすべて、ゲームを作るためにPyxelが提供している専用の関数です。この「Pythonの機能」と「Pyxelの機能」の区別がつくようになることが、上達の第一歩です。</p>
-                    </div>
-                </div>
-            </details>
+
         </section>
 
         <!-- この章で学んだこと -->
