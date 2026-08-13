@@ -454,10 +454,6 @@ pyxel.run(update, draw)</code></pre>
             </div>
 
             <div class="bg-amber-950/40 border-l-4 border-amber-500 p-4 my-6">
-                <p class="font-bold text-amber-300 text-sm mb-2">⚠️ 注意：pyxel.cls() の cls は class ではありません！</p>
-                <p class="text-sm text-slate-300 mb-2">
-                    <code>pyxel.cls()</code> は <strong>Cl</strong>ear <strong>S</strong>creen（画面クリア）の略であり、画面全体を指定した色で塗りつぶすPyxelの関数です。第2章で学んだ Python の <code>class</code>（クラス）とは全く無関係ですので、絶対に混同しないでください。
-                </p>
                 <p class="text-sm text-amber-200 mt-2 font-bold">なぜ draw() の最初に cls() を呼ぶのか？</p>
                 <p class="text-sm text-slate-300">
                     ゲームは毎フレーム新しく絵を描き直します。もし最初に画面をクリア（塗りつぶし）しないと、<strong>前のフレームで描いた絵がそのまま画面に残ってしまい、残像だらけになってしまう</strong>からです。
